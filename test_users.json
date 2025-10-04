@@ -1,0 +1,279 @@
+{
+  "generated_at": "2025-10-04T00:00:00Z",
+  "user_structure": {
+    "table_name": "users",
+    "role_field": "account_type",
+    "possible_roles": ["guest", "host", "admin"],
+    "registration_endpoint": "/api/auth/register",
+    "login_endpoint": "/api/auth/login",
+    "authentication_method": "JWT Bearer Token",
+    "identifier_fields": ["email", "phone_number"],
+    "password_field": "password_hash"
+  },
+  "total_users": 8,
+  "verified_users": 8,
+  "notes": [
+    "All users are seeded from backend/db.sql",
+    "Passwords are stored in plain text for development (password_hash field)",
+    "Login accepts phone_number or email as identifier",
+    "Phone verification status varies by user"
+  ],
+  "users": [
+    {
+      "id": "user_001",
+      "name": "John Doe",
+      "email": "john.doe@email.com",
+      "phone_number": "+1234567890",
+      "password": "password123",
+      "account_type": "host",
+      "is_phone_verified": true,
+      "profile_picture_url": "https://picsum.photos/seed/user001/200/200.jpg",
+      "verified": true,
+      "description": "Host with active listings"
+    },
+    {
+      "id": "user_002",
+      "name": "Jane Smith",
+      "email": "jane.smith@email.com",
+      "phone_number": "+1234567891",
+      "password": "password123",
+      "account_type": "host",
+      "is_phone_verified": true,
+      "profile_picture_url": "https://picsum.photos/seed/user002/200/200.jpg",
+      "verified": true,
+      "description": "Host with multiple properties"
+    },
+    {
+      "id": "user_003",
+      "name": "Mike Johnson",
+      "email": "mike.j@email.com",
+      "phone_number": "+1234567892",
+      "password": "admin123",
+      "account_type": "guest",
+      "is_phone_verified": true,
+      "profile_picture_url": "https://picsum.photos/seed/user003/200/200.jpg",
+      "verified": true,
+      "description": "Guest with completed bookings and reviews"
+    },
+    {
+      "id": "user_004",
+      "name": "Sarah Williams",
+      "email": "sarah.w@email.com",
+      "phone_number": "+1234567893",
+      "password": "user123",
+      "account_type": "guest",
+      "is_phone_verified": false,
+      "profile_picture_url": "https://picsum.photos/seed/user004/200/200.jpg",
+      "verified": true,
+      "description": "Guest without phone verification"
+    },
+    {
+      "id": "user_005",
+      "name": "David Brown",
+      "email": "david.brown@email.com",
+      "phone_number": "+1234567894",
+      "password": "password123",
+      "account_type": "host",
+      "is_phone_verified": true,
+      "profile_picture_url": "https://picsum.photos/seed/user005/200/200.jpg",
+      "verified": true,
+      "description": "Host with downtown loft listing"
+    },
+    {
+      "id": "user_006",
+      "name": "Emily Davis",
+      "email": "emily.davis@email.com",
+      "phone_number": "+1234567895",
+      "password": "password123",
+      "account_type": "guest",
+      "is_phone_verified": true,
+      "profile_picture_url": null,
+      "verified": true,
+      "description": "Guest with multiple bookings"
+    },
+    {
+      "id": "user_007",
+      "name": "Robert Wilson",
+      "email": "robert.wilson@email.com",
+      "phone_number": "+1234567896",
+      "password": "user123",
+      "account_type": "guest",
+      "is_phone_verified": true,
+      "profile_picture_url": "https://picsum.photos/seed/user007/200/200.jpg",
+      "verified": true,
+      "description": "Guest user with bookings"
+    },
+    {
+      "id": "user_008",
+      "name": "Lisa Anderson",
+      "email": "lisa.anderson@email.com",
+      "phone_number": "+1234567897",
+      "password": "password123",
+      "account_type": "host",
+      "is_phone_verified": true,
+      "profile_picture_url": "https://picsum.photos/seed/user008/200/200.jpg",
+      "verified": true,
+      "description": "Host with countryside farmhouse"
+    }
+  ],
+  "by_role": {
+    "host": [
+      {
+        "id": "user_001",
+        "email": "john.doe@email.com",
+        "phone_number": "+1234567890",
+        "password": "password123",
+        "verified": true,
+        "description": "Host with beach villa and tropical paradise listings"
+      },
+      {
+        "id": "user_002",
+        "email": "jane.smith@email.com",
+        "phone_number": "+1234567891",
+        "password": "password123",
+        "verified": true,
+        "description": "Host with mountain retreat and lakeside cottage"
+      },
+      {
+        "id": "user_005",
+        "email": "david.brown@email.com",
+        "phone_number": "+1234567894",
+        "password": "password123",
+        "verified": true,
+        "description": "Host with modern downtown loft"
+      },
+      {
+        "id": "user_008",
+        "email": "lisa.anderson@email.com",
+        "phone_number": "+1234567897",
+        "password": "password123",
+        "verified": true,
+        "description": "Host with countryside farmhouse"
+      }
+    ],
+    "guest": [
+      {
+        "id": "user_003",
+        "email": "mike.j@email.com",
+        "phone_number": "+1234567892",
+        "password": "admin123",
+        "verified": true,
+        "description": "Guest with confirmed bookings and reviews"
+      },
+      {
+        "id": "user_004",
+        "email": "sarah.w@email.com",
+        "phone_number": "+1234567893",
+        "password": "user123",
+        "verified": true,
+        "description": "Guest without phone verification"
+      },
+      {
+        "id": "user_006",
+        "email": "emily.davis@email.com",
+        "phone_number": "+1234567895",
+        "password": "password123",
+        "verified": true,
+        "description": "Guest with multiple trips"
+      },
+      {
+        "id": "user_007",
+        "email": "robert.wilson@email.com",
+        "phone_number": "+1234567896",
+        "password": "user123",
+        "verified": true,
+        "description": "Guest with confirmed bookings"
+      }
+    ]
+  },
+  "login_examples": {
+    "with_email": {
+      "endpoint": "POST /api/auth/login",
+      "payload": {
+        "identifier": "john.doe@email.com",
+        "password": "password123"
+      },
+      "expected_response": {
+        "user": {
+          "id": "user_001",
+          "name": "John Doe",
+          "email": "john.doe@email.com",
+          "phone_number": "+1234567890",
+          "account_type": "host",
+          "is_phone_verified": true
+        },
+        "token": "jwt_token_string"
+      }
+    },
+    "with_phone": {
+      "endpoint": "POST /api/auth/login",
+      "payload": {
+        "identifier": "+1234567890",
+        "password": "password123"
+      },
+      "expected_response": {
+        "user": {
+          "id": "user_001",
+          "name": "John Doe",
+          "email": "john.doe@email.com",
+          "phone_number": "+1234567890",
+          "account_type": "host",
+          "is_phone_verified": true
+        },
+        "token": "jwt_token_string"
+      }
+    }
+  },
+  "registration_example": {
+    "endpoint": "POST /api/auth/register",
+    "payload": {
+      "name": "New User",
+      "email": "newuser@email.com",
+      "phone_number": "+1234567999",
+      "password_hash": "password123",
+      "account_type": "guest"
+    },
+    "expected_response": {
+      "user": {
+        "id": "generated_uuid",
+        "name": "New User",
+        "email": "newuser@email.com",
+        "phone_number": "+1234567999",
+        "account_type": "guest",
+        "is_phone_verified": false
+      },
+      "token": "jwt_token_string"
+    }
+  },
+  "test_scenarios": {
+    "host_workflow": {
+      "user": "user_001",
+      "credentials": {
+        "identifier": "john.doe@email.com",
+        "password": "password123"
+      },
+      "available_actions": [
+        "View host dashboard at /host/dashboard",
+        "Create new listing at /host/listing/new",
+        "Manage existing listings (villa_001, villa_004)",
+        "View and respond to booking requests",
+        "Communicate with guests via messaging"
+      ]
+    },
+    "guest_workflow": {
+      "user": "user_003",
+      "credentials": {
+        "identifier": "mike.j@email.com",
+        "password": "admin123"
+      },
+      "available_actions": [
+        "Search for villas on homepage",
+        "View villa details",
+        "Make booking requests",
+        "View trips and bookings",
+        "Message hosts",
+        "Submit reviews after completed trips"
+      ]
+    }
+  }
+}

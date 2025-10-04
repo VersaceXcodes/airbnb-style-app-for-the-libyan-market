@@ -1,0 +1,1055 @@
+{
+  "testSuite": {
+    "name": "Dar Libya Vacation Rental Platform Test Suite",
+    "version": "1.0.0",
+    "generated_at": "2025-10-04T00:00:00Z",
+    "base_url": "https://123airbnb-style-app-for-the-libyan-market.launchpulse.ai",
+    "total_test_cases": 45
+  },
+  "testCategories": [
+    "functionality",
+    "authentication",
+    "navigation",
+    "forms",
+    "search",
+    "booking",
+    "messaging",
+    "reviews",
+    "interface",
+    "content",
+    "responsive",
+    "accessibility",
+    "performance"
+  ],
+  "testCases": [
+    {
+      "id": "func-001",
+      "name": "Functional Application Test",
+      "category": "functionality",
+      "priority": "critical",
+      "description": "Verify the application has actual functionality beyond basic placeholder",
+      "preconditions": [],
+      "steps": [
+        "Navigate to homepage at /",
+        "Verify page loads successfully",
+        "Check for multiple interactive elements (buttons, forms, links, search bar)",
+        "Verify navigation menu is present and functional",
+        "Check for property listings or search functionality",
+        "Verify the page shows real vacation rental content, not placeholder text"
+      ],
+      "expectedOutcome": "Application displays functional vacation rental marketplace with search, listings, and navigation",
+      "failureCondition": "If page only shows 'Vite + React' placeholder or generic template content, this test should FAIL",
+      "testData": null
+    },
+    {
+      "id": "auth-001",
+      "name": "User Login - Email",
+      "category": "authentication",
+      "priority": "critical",
+      "description": "Test user login with email identifier",
+      "preconditions": [
+        "User must not be logged in",
+        "Test user exists in database"
+      ],
+      "steps": [
+        "Navigate to /login",
+        "Enter email: john.doe@email.com",
+        "Enter password: password123",
+        "Click login button",
+        "Verify successful redirect to homepage or dashboard",
+        "Verify user menu shows logged-in state"
+      ],
+      "expectedOutcome": "User successfully logs in and sees authenticated UI",
+      "failureCondition": "Error message displayed or login fails",
+      "testData": {
+        "identifier": "john.doe@email.com",
+        "password": "password123",
+        "expected_user": "John Doe"
+      }
+    },
+    {
+      "id": "auth-002",
+      "name": "User Login - Phone Number",
+      "category": "authentication",
+      "priority": "critical",
+      "description": "Test user login with phone number identifier",
+      "preconditions": [
+        "User must not be logged in"
+      ],
+      "steps": [
+        "Navigate to /login",
+        "Enter phone number: +1234567890",
+        "Enter password: password123",
+        "Click login button",
+        "Verify successful authentication"
+      ],
+      "expectedOutcome": "User successfully logs in using phone number",
+      "failureCondition": "Login fails or error displayed",
+      "testData": {
+        "identifier": "+1234567890",
+        "password": "password123"
+      }
+    },
+    {
+      "id": "auth-003",
+      "name": "Invalid Login Credentials",
+      "category": "authentication",
+      "priority": "high",
+      "description": "Verify error handling for invalid credentials",
+      "preconditions": [],
+      "steps": [
+        "Navigate to /login",
+        "Enter email: invalid@email.com",
+        "Enter password: wrongpassword",
+        "Click login button",
+        "Verify error message is displayed",
+        "Verify user remains on login page"
+      ],
+      "expectedOutcome": "Error message displayed indicating invalid credentials",
+      "failureCondition": "User is logged in or no error message shown",
+      "testData": {
+        "identifier": "invalid@email.com",
+        "password": "wrongpassword"
+      }
+    },
+    {
+      "id": "auth-004",
+      "name": "User Registration",
+      "category": "authentication",
+      "priority": "critical",
+      "description": "Test new user registration flow",
+      "preconditions": [
+        "User must not be logged in"
+      ],
+      "steps": [
+        "Navigate to /signup",
+        "Fill in name field",
+        "Fill in email field with unique email",
+        "Fill in phone number",
+        "Fill in password",
+        "Select account type (guest or host)",
+        "Click register button",
+        "Verify successful registration and redirect"
+      ],
+      "expectedOutcome": "New user account created and user logged in",
+      "failureCondition": "Registration fails or validation errors shown",
+      "testData": {
+        "name": "Test User",
+        "email": "testuser@example.com",
+        "phone_number": "+1234567999",
+        "password": "testpass123",
+        "account_type": "guest"
+      }
+    },
+    {
+      "id": "auth-005",
+      "name": "User Logout",
+      "category": "authentication",
+      "priority": "high",
+      "description": "Test user logout functionality",
+      "preconditions": [
+        "User must be logged in"
+      ],
+      "steps": [
+        "Click on user menu in navigation",
+        "Click logout button",
+        "Verify user is redirected",
+        "Verify authentication state cleared",
+        "Verify protected routes are no longer accessible"
+      ],
+      "expectedOutcome": "User successfully logged out and authentication cleared",
+      "failureCondition": "User remains logged in or can access protected routes",
+      "testData": null
+    },
+    {
+      "id": "nav-001",
+      "name": "Homepage Navigation",
+      "category": "navigation",
+      "priority": "high",
+      "description": "Verify homepage loads and displays main content",
+      "preconditions": [],
+      "steps": [
+        "Navigate to /",
+        "Verify page loads without errors",
+        "Check for search functionality",
+        "Check for featured listings or browse options",
+        "Verify footer is present",
+        "Verify navigation menu is functional"
+      ],
+      "expectedOutcome": "Homepage displays with search bar, listings preview, and navigation",
+      "failureCondition": "Page fails to load or missing core components",
+      "testData": null
+    },
+    {
+      "id": "nav-002",
+      "name": "Top Navigation Menu",
+      "category": "navigation",
+      "priority": "high",
+      "description": "Test all navigation menu links",
+      "preconditions": [],
+      "steps": [
+        "Load homepage",
+        "Verify navigation bar is visible",
+        "Check for logo/home link",
+        "Check for search/browse options",
+        "Check for login/signup links (when logged out)",
+        "Check for user menu (when logged in)",
+        "Click each navigation item",
+        "Verify correct page loads"
+      ],
+      "expectedOutcome": "All navigation links work correctly",
+      "failureCondition": "Any navigation link broken or leads to 404",
+      "testData": null
+    },
+    {
+      "id": "nav-003",
+      "name": "Protected Route Access",
+      "category": "navigation",
+      "priority": "high",
+      "description": "Verify authentication protection on routes",
+      "preconditions": [
+        "User must not be logged in"
+      ],
+      "steps": [
+        "Attempt to navigate to /profile",
+        "Verify redirect to login page",
+        "Attempt to navigate to /host/dashboard",
+        "Verify redirect to login page",
+        "Attempt to navigate to /host/listing/new",
+        "Verify redirect to login page"
+      ],
+      "expectedOutcome": "Unauthenticated users redirected to login",
+      "failureCondition": "Protected routes accessible without authentication",
+      "testData": null
+    },
+    {
+      "id": "search-001",
+      "name": "Basic Property Search",
+      "category": "search",
+      "priority": "critical",
+      "description": "Test basic search functionality",
+      "preconditions": [],
+      "steps": [
+        "Navigate to homepage",
+        "Locate search form",
+        "Enter location or leave empty",
+        "Click search button",
+        "Verify redirect to /search",
+        "Verify property listings are displayed",
+        "Check that results show property cards with images"
+      ],
+      "expectedOutcome": "Search results page displays available properties",
+      "failureCondition": "No results shown or search fails",
+      "testData": {
+        "location": ""
+      }
+    },
+    {
+      "id": "search-002",
+      "name": "Search with Location Filter",
+      "category": "search",
+      "priority": "high",
+      "description": "Test location-based search",
+      "preconditions": [],
+      "steps": [
+        "Navigate to search page",
+        "Enter location: Miami",
+        "Click search or apply filters",
+        "Verify results contain Miami properties",
+        "Check property addresses include Miami"
+      ],
+      "expectedOutcome": "Results filtered by location",
+      "failureCondition": "Non-matching locations shown",
+      "testData": {
+        "location": "Miami"
+      }
+    },
+    {
+      "id": "search-003",
+      "name": "Search with Date Range",
+      "category": "search",
+      "priority": "high",
+      "description": "Test availability date filtering",
+      "preconditions": [],
+      "steps": [
+        "Navigate to search page",
+        "Select check-in date (future date)",
+        "Select check-out date (after check-in)",
+        "Apply filters",
+        "Verify only available properties shown",
+        "Verify no conflicting bookings"
+      ],
+      "expectedOutcome": "Results show only available properties for selected dates",
+      "failureCondition": "Unavailable properties shown",
+      "testData": {
+        "check_in": "2024-06-15",
+        "check_out": "2024-06-20"
+      }
+    },
+    {
+      "id": "search-004",
+      "name": "Search with Price Range",
+      "category": "search",
+      "priority": "high",
+      "description": "Test price filtering",
+      "preconditions": [],
+      "steps": [
+        "Navigate to search page",
+        "Set minimum price: 100",
+        "Set maximum price: 300",
+        "Apply filters",
+        "Verify all results within price range",
+        "Check property prices displayed"
+      ],
+      "expectedOutcome": "Results filtered by price range",
+      "failureCondition": "Properties outside range shown",
+      "testData": {
+        "price_min": 100,
+        "price_max": 300
+      }
+    },
+    {
+      "id": "search-005",
+      "name": "Search with Amenities Filter",
+      "category": "search",
+      "priority": "medium",
+      "description": "Test amenity-based filtering",
+      "preconditions": [],
+      "steps": [
+        "Navigate to search page",
+        "Open amenities filter",
+        "Select amenities: WiFi, Pool",
+        "Apply filters",
+        "Verify results have selected amenities",
+        "Click on a property and verify amenities listed"
+      ],
+      "expectedOutcome": "Results show only properties with selected amenities",
+      "failureCondition": "Properties without amenities shown",
+      "testData": {
+        "amenities": ["WiFi", "Pool"]
+      }
+    },
+    {
+      "id": "listing-001",
+      "name": "View Property Details",
+      "category": "functionality",
+      "priority": "critical",
+      "description": "Test property listing detail page",
+      "preconditions": [
+        "At least one property exists in database"
+      ],
+      "steps": [
+        "Navigate to /listing/villa_001",
+        "Verify property title displayed",
+        "Check for property photos/gallery",
+        "Check for price per night",
+        "Check for property description",
+        "Check for amenities list",
+        "Check for host information",
+        "Check for reviews section",
+        "Verify booking button/form present"
+      ],
+      "expectedOutcome": "Complete property details displayed with all information",
+      "failureCondition": "Missing key information or 404 error",
+      "testData": {
+        "villa_id": "villa_001"
+      }
+    },
+    {
+      "id": "listing-002",
+      "name": "Property Photo Gallery",
+      "category": "interface",
+      "priority": "medium",
+      "description": "Test property image display",
+      "preconditions": [],
+      "steps": [
+        "Navigate to property detail page",
+        "Verify cover photo displayed",
+        "Click on photo gallery",
+        "Navigate through multiple photos",
+        "Verify all photos load correctly",
+        "Close gallery"
+      ],
+      "expectedOutcome": "Photo gallery functional with all images",
+      "failureCondition": "Images fail to load or gallery broken",
+      "testData": null
+    },
+    {
+      "id": "booking-001",
+      "name": "Create Booking Request",
+      "category": "booking",
+      "priority": "critical",
+      "description": "Test creating a new booking",
+      "preconditions": [
+        "User must be logged in as guest",
+        "Property must be available"
+      ],
+      "steps": [
+        "Navigate to property detail page",
+        "Select check-in date",
+        "Select check-out date",
+        "Enter number of guests",
+        "Review price calculation",
+        "Click 'Request to Book' or similar button",
+        "Verify redirect to booking confirmation",
+        "Enter guest message",
+        "Confirm booking request",
+        "Verify booking created successfully"
+      ],
+      "expectedOutcome": "Booking request created and visible in guest trips",
+      "failureCondition": "Booking fails or error displayed",
+      "testData": {
+        "villa_id": "villa_002",
+        "check_in": "2024-07-01",
+        "check_out": "2024-07-05",
+        "num_guests": 2
+      }
+    },
+    {
+      "id": "booking-002",
+      "name": "View Booking Details",
+      "category": "booking",
+      "priority": "high",
+      "description": "Test viewing trip/booking details",
+      "preconditions": [
+        "User must be logged in",
+        "At least one booking exists"
+      ],
+      "steps": [
+        "Navigate to /profile or trips section",
+        "Click on a booking",
+        "Verify booking details displayed",
+        "Check property information",
+        "Check dates and guest count",
+        "Check total price",
+        "Check booking status",
+        "Verify host contact information"
+      ],
+      "expectedOutcome": "Complete booking details displayed",
+      "failureCondition": "Missing information or page fails to load",
+      "testData": {
+        "booking_id": "booking_001"
+      }
+    },
+    {
+      "id": "booking-003",
+      "name": "Host Approve Booking",
+      "category": "booking",
+      "priority": "critical",
+      "description": "Test host booking approval",
+      "preconditions": [
+        "User logged in as host",
+        "Pending booking exists for host property"
+      ],
+      "steps": [
+        "Navigate to host dashboard",
+        "View pending bookings",
+        "Click on a pending booking",
+        "Review booking details",
+        "Click approve/confirm button",
+        "Add check-in instructions",
+        "Confirm approval",
+        "Verify booking status changes to confirmed"
+      ],
+      "expectedOutcome": "Booking status updated to confirmed",
+      "failureCondition": "Status not updated or error occurs",
+      "testData": {
+        "booking_id": "booking_002"
+      }
+    },
+    {
+      "id": "booking-004",
+      "name": "Cancel Booking",
+      "category": "booking",
+      "priority": "high",
+      "description": "Test booking cancellation",
+      "preconditions": [
+        "User logged in",
+        "Active booking exists"
+      ],
+      "steps": [
+        "Navigate to booking details",
+        "Click cancel button",
+        "Provide cancellation reason",
+        "Confirm cancellation",
+        "Verify booking status updated",
+        "Verify availability dates released"
+      ],
+      "expectedOutcome": "Booking successfully cancelled",
+      "failureCondition": "Cancellation fails or status not updated",
+      "testData": null
+    },
+    {
+      "id": "host-001",
+      "name": "Access Host Dashboard",
+      "category": "functionality",
+      "priority": "critical",
+      "description": "Test host dashboard access and content",
+      "preconditions": [
+        "User logged in as host"
+      ],
+      "steps": [
+        "Navigate to /host/dashboard",
+        "Verify page loads successfully",
+        "Check for listings overview",
+        "Check for bookings section",
+        "Check for create listing button",
+        "Verify statistics or summary data"
+      ],
+      "expectedOutcome": "Host dashboard displays with all sections",
+      "failureCondition": "Dashboard fails to load or missing sections",
+      "testData": null
+    },
+    {
+      "id": "host-002",
+      "name": "Create New Listing",
+      "category": "functionality",
+      "priority": "critical",
+      "description": "Test creating a new property listing",
+      "preconditions": [
+        "User logged in as host"
+      ],
+      "steps": [
+        "Navigate to /host/listing/new",
+        "Fill in property title",
+        "Fill in description",
+        "Select property type",
+        "Enter capacity (guests, bedrooms, beds, bathrooms)",
+        "Enter pricing (per night, cleaning fee)",
+        "Set minimum nights",
+        "Add house rules",
+        "Select payment method",
+        "Enter address and location",
+        "Add photos (if possible)",
+        "Select amenities",
+        "Save as draft or publish",
+        "Verify listing created"
+      ],
+      "expectedOutcome": "New listing created successfully",
+      "failureCondition": "Form validation errors or creation fails",
+      "testData": {
+        "title": "Test Property",
+        "property_type": "apartment",
+        "num_guests": 4,
+        "price_per_night": 150
+      }
+    },
+    {
+      "id": "host-003",
+      "name": "Edit Existing Listing",
+      "category": "functionality",
+      "priority": "high",
+      "description": "Test editing property listing",
+      "preconditions": [
+        "User logged in as host",
+        "User owns at least one listing"
+      ],
+      "steps": [
+        "Navigate to host dashboard",
+        "Click on existing listing",
+        "Click edit button",
+        "Modify property details",
+        "Save changes",
+        "Verify changes saved",
+        "Verify updated data displayed"
+      ],
+      "expectedOutcome": "Listing successfully updated",
+      "failureCondition": "Changes not saved or errors occur",
+      "testData": null
+    },
+    {
+      "id": "host-004",
+      "name": "Manage Property Availability",
+      "category": "functionality",
+      "priority": "high",
+      "description": "Test availability calendar management",
+      "preconditions": [
+        "User logged in as host",
+        "User owns listing"
+      ],
+      "steps": [
+        "Navigate to listing management",
+        "Open availability calendar",
+        "Block specific dates",
+        "Unblock dates",
+        "Save changes",
+        "Verify availability updated",
+        "Check that blocked dates not bookable"
+      ],
+      "expectedOutcome": "Availability calendar updated successfully",
+      "failureCondition": "Changes not saved or calendar not functional",
+      "testData": null
+    },
+    {
+      "id": "messaging-001",
+      "name": "Send Message to Host",
+      "category": "messaging",
+      "priority": "high",
+      "description": "Test guest-to-host messaging",
+      "preconditions": [
+        "User logged in as guest",
+        "Booking exists"
+      ],
+      "steps": [
+        "Navigate to booking or inbox",
+        "Open message thread or start new conversation",
+        "Type message content",
+        "Send message",
+        "Verify message appears in thread",
+        "Verify message marked as sent"
+      ],
+      "expectedOutcome": "Message sent successfully and visible in thread",
+      "failureCondition": "Message fails to send or not displayed",
+      "testData": {
+        "message": "Hello, I have a question about check-in."
+      }
+    },
+    {
+      "id": "messaging-002",
+      "name": "View Message Inbox",
+      "category": "messaging",
+      "priority": "high",
+      "description": "Test message inbox display",
+      "preconditions": [
+        "User logged in",
+        "Messages exist"
+      ],
+      "steps": [
+        "Navigate to inbox",
+        "Verify message threads listed",
+        "Check for unread count",
+        "Check thread previews",
+        "Click on a thread",
+        "Verify full conversation displayed",
+        "Check message timestamps"
+      ],
+      "expectedOutcome": "Inbox displays all message threads correctly",
+      "failureCondition": "Messages not displayed or inbox broken",
+      "testData": null
+    },
+    {
+      "id": "messaging-003",
+      "name": "Mark Message as Read",
+      "category": "messaging",
+      "priority": "medium",
+      "description": "Test message read status update",
+      "preconditions": [
+        "User logged in",
+        "Unread messages exist"
+      ],
+      "steps": [
+        "Navigate to inbox",
+        "Note unread count",
+        "Open unread message thread",
+        "View messages",
+        "Return to inbox",
+        "Verify unread count decreased",
+        "Verify thread no longer marked unread"
+      ],
+      "expectedOutcome": "Messages marked as read after viewing",
+      "failureCondition": "Read status not updated",
+      "testData": null
+    },
+    {
+      "id": "review-001",
+      "name": "Submit Review for Completed Stay",
+      "category": "reviews",
+      "priority": "high",
+      "description": "Test guest review submission",
+      "preconditions": [
+        "User logged in as guest",
+        "Completed booking exists",
+        "Review not yet submitted"
+      ],
+      "steps": [
+        "Navigate to past trips",
+        "Select completed booking",
+        "Click 'Write Review' button",
+        "Enter star rating (1-5)",
+        "Write public comment",
+        "Write private feedback (if available)",
+        "Submit review",
+        "Verify review submitted successfully",
+        "Check review visibility status"
+      ],
+      "expectedOutcome": "Review submitted and saved (may be hidden until host reviews)",
+      "failureCondition": "Review submission fails or form errors",
+      "testData": {
+        "rating": 5,
+        "comment": "Amazing stay! Highly recommend."
+      }
+    },
+    {
+      "id": "review-002",
+      "name": "View Property Reviews",
+      "category": "reviews",
+      "priority": "high",
+      "description": "Test viewing reviews on property page",
+      "preconditions": [
+        "Property has visible reviews"
+      ],
+      "steps": [
+        "Navigate to property detail page",
+        "Scroll to reviews section",
+        "Verify reviews displayed",
+        "Check star ratings",
+        "Check review comments",
+        "Check reviewer names and dates",
+        "Verify average rating calculation"
+      ],
+      "expectedOutcome": "All visible reviews displayed correctly",
+      "failureCondition": "Reviews not shown or data incorrect",
+      "testData": {
+        "villa_id": "villa_001"
+      }
+    },
+    {
+      "id": "profile-001",
+      "name": "View User Profile",
+      "category": "functionality",
+      "priority": "high",
+      "description": "Test user profile page",
+      "preconditions": [
+        "User logged in"
+      ],
+      "steps": [
+        "Navigate to /profile",
+        "Verify profile information displayed",
+        "Check name, email, phone",
+        "Check profile picture",
+        "Check account type",
+        "Check verification status",
+        "Verify edit option available"
+      ],
+      "expectedOutcome": "Profile page displays user information",
+      "failureCondition": "Profile fails to load or data missing",
+      "testData": null
+    },
+    {
+      "id": "profile-002",
+      "name": "Edit User Profile",
+      "category": "forms",
+      "priority": "high",
+      "description": "Test profile editing functionality",
+      "preconditions": [
+        "User logged in"
+      ],
+      "steps": [
+        "Navigate to profile page",
+        "Click edit button",
+        "Modify name or other fields",
+        "Save changes",
+        "Verify success message",
+        "Verify updated data displayed",
+        "Refresh page and verify changes persisted"
+      ],
+      "expectedOutcome": "Profile updated successfully",
+      "failureCondition": "Changes not saved or errors occur",
+      "testData": {
+        "name": "Updated Name"
+      }
+    },
+    {
+      "id": "profile-003",
+      "name": "View Host Public Profile",
+      "category": "functionality",
+      "priority": "medium",
+      "description": "Test public host profile view",
+      "preconditions": [
+        "Host user exists"
+      ],
+      "steps": [
+        "Navigate to /profile/user_001",
+        "Verify host name displayed",
+        "Check profile picture",
+        "Check join date",
+        "Check verification badge",
+        "Check host's listings",
+        "Verify no private information shown"
+      ],
+      "expectedOutcome": "Public profile displays appropriate information",
+      "failureCondition": "Profile fails to load or shows private data",
+      "testData": {
+        "host_id": "user_001"
+      }
+    },
+    {
+      "id": "ui-001",
+      "name": "Responsive Design - Mobile",
+      "category": "responsive",
+      "priority": "high",
+      "description": "Test mobile responsive layout",
+      "preconditions": [],
+      "steps": [
+        "Set browser to mobile viewport (375x667)",
+        "Navigate to homepage",
+        "Verify mobile navigation menu",
+        "Check search form layout",
+        "View property listing cards",
+        "Check property detail page",
+        "Verify all elements fit within viewport",
+        "Test touch interactions"
+      ],
+      "expectedOutcome": "All pages responsive and functional on mobile",
+      "failureCondition": "Layout broken or elements overflow",
+      "testData": null
+    },
+    {
+      "id": "ui-002",
+      "name": "Responsive Design - Tablet",
+      "category": "responsive",
+      "priority": "medium",
+      "description": "Test tablet responsive layout",
+      "preconditions": [],
+      "steps": [
+        "Set browser to tablet viewport (768x1024)",
+        "Navigate through key pages",
+        "Verify layout adapts appropriately",
+        "Check grid layouts and spacing",
+        "Test navigation menu"
+      ],
+      "expectedOutcome": "Layout optimized for tablet screens",
+      "failureCondition": "Layout issues or poor spacing",
+      "testData": null
+    },
+    {
+      "id": "ui-003",
+      "name": "UI Components Display",
+      "category": "interface",
+      "priority": "high",
+      "description": "Verify proper rendering of UI components",
+      "preconditions": [],
+      "steps": [
+        "Navigate through application",
+        "Check buttons render correctly",
+        "Check form inputs styled properly",
+        "Check cards and containers",
+        "Check modals and dialogs",
+        "Check dropdowns and selects",
+        "Verify consistent styling"
+      ],
+      "expectedOutcome": "All UI components properly styled and functional",
+      "failureCondition": "Broken styles or missing components",
+      "testData": null
+    },
+    {
+      "id": "ui-004",
+      "name": "Loading States",
+      "category": "interface",
+      "priority": "medium",
+      "description": "Verify loading indicators",
+      "preconditions": [],
+      "steps": [
+        "Perform actions that trigger loading",
+        "Check for loading spinners or skeletons",
+        "Verify loading states clear after data loads",
+        "Check error states if applicable"
+      ],
+      "expectedOutcome": "Loading states displayed appropriately",
+      "failureCondition": "No loading indication or stuck loading",
+      "testData": null
+    },
+    {
+      "id": "content-001",
+      "name": "Content Quality Test",
+      "category": "content",
+      "priority": "critical",
+      "description": "Verify application has meaningful content",
+      "preconditions": [],
+      "steps": [
+        "Navigate to homepage",
+        "Check for substantial content beyond placeholders",
+        "Verify proper heading structure",
+        "Check for actual property listings data",
+        "Verify images load correctly",
+        "Check for professional appearance",
+        "Verify no 'Lorem ipsum' or template text"
+      ],
+      "expectedOutcome": "Application demonstrates real functionality with actual content",
+      "failureCondition": "Only placeholder or template content visible",
+      "testData": null
+    },
+    {
+      "id": "content-002",
+      "name": "Image Loading",
+      "category": "content",
+      "priority": "high",
+      "description": "Test image loading across application",
+      "preconditions": [],
+      "steps": [
+        "Navigate through application",
+        "Check property photos load",
+        "Check user profile pictures",
+        "Verify cover photos display",
+        "Check for broken image icons",
+        "Verify alt text on images"
+      ],
+      "expectedOutcome": "All images load successfully",
+      "failureCondition": "Broken images or loading failures",
+      "testData": null
+    },
+    {
+      "id": "perf-001",
+      "name": "Page Load Performance",
+      "category": "performance",
+      "priority": "medium",
+      "description": "Test page loading speed",
+      "preconditions": [],
+      "steps": [
+        "Clear browser cache",
+        "Navigate to homepage",
+        "Measure time to interactive",
+        "Navigate to search results",
+        "Navigate to property details",
+        "Verify pages load in reasonable time"
+      ],
+      "expectedOutcome": "Pages load within acceptable timeframe (under 3 seconds)",
+      "failureCondition": "Excessive load times or timeouts",
+      "testData": null
+    },
+    {
+      "id": "access-001",
+      "name": "Keyboard Navigation",
+      "category": "accessibility",
+      "priority": "medium",
+      "description": "Test keyboard accessibility",
+      "preconditions": [],
+      "steps": [
+        "Navigate using Tab key",
+        "Verify focus indicators visible",
+        "Test form navigation",
+        "Test button activation with Enter/Space",
+        "Verify tab order logical",
+        "Check for keyboard traps"
+      ],
+      "expectedOutcome": "All interactive elements accessible via keyboard",
+      "failureCondition": "Elements not reachable or keyboard traps exist",
+      "testData": null
+    },
+    {
+      "id": "access-002",
+      "name": "Screen Reader Compatibility",
+      "category": "accessibility",
+      "priority": "medium",
+      "description": "Test screen reader support",
+      "preconditions": [],
+      "steps": [
+        "Enable screen reader",
+        "Navigate through key pages",
+        "Verify semantic HTML usage",
+        "Check for ARIA labels",
+        "Verify images have alt text",
+        "Check form labels",
+        "Verify heading hierarchy"
+      ],
+      "expectedOutcome": "Content accessible to screen readers",
+      "failureCondition": "Important content not announced or missing labels",
+      "testData": null
+    },
+    {
+      "id": "form-001",
+      "name": "Form Validation",
+      "category": "forms",
+      "priority": "high",
+      "description": "Test form input validation",
+      "preconditions": [],
+      "steps": [
+        "Open any form (login, registration, search)",
+        "Submit empty form",
+        "Verify required field errors shown",
+        "Enter invalid email format",
+        "Verify email validation error",
+        "Enter valid data",
+        "Verify form submits successfully"
+      ],
+      "expectedOutcome": "Forms validate inputs and show appropriate errors",
+      "failureCondition": "Validation missing or incorrect",
+      "testData": null
+    },
+    {
+      "id": "error-001",
+      "name": "404 Error Handling",
+      "category": "functionality",
+      "priority": "medium",
+      "description": "Test handling of invalid routes",
+      "preconditions": [],
+      "steps": [
+        "Navigate to invalid URL",
+        "Verify appropriate error handling",
+        "Check for redirect to homepage or 404 page",
+        "Verify navigation still works"
+      ],
+      "expectedOutcome": "Invalid routes handled gracefully",
+      "failureCondition": "Blank page or application crash",
+      "testData": {
+        "invalid_url": "/nonexistent-page"
+      }
+    },
+    {
+      "id": "integration-001",
+      "name": "End-to-End User Journey - Guest",
+      "category": "functionality",
+      "priority": "critical",
+      "description": "Complete guest booking flow",
+      "preconditions": [],
+      "steps": [
+        "1. Register new guest account",
+        "2. Search for properties",
+        "3. View property details",
+        "4. Create booking request",
+        "5. View booking in trips",
+        "6. Send message to host",
+        "7. View inbox messages",
+        "8. (After stay) Submit review"
+      ],
+      "expectedOutcome": "Complete flow works end-to-end",
+      "failureCondition": "Any step fails or breaks flow",
+      "testData": null
+    },
+    {
+      "id": "integration-002",
+      "name": "End-to-End User Journey - Host",
+      "category": "functionality",
+      "priority": "critical",
+      "description": "Complete host listing flow",
+      "preconditions": [],
+      "steps": [
+        "1. Register as host",
+        "2. Navigate to host dashboard",
+        "3. Create new listing",
+        "4. Add photos and amenities",
+        "5. Set availability",
+        "6. Publish listing",
+        "7. Receive booking request",
+        "8. Approve booking",
+        "9. Communicate with guest",
+        "10. (After stay) Submit review"
+      ],
+      "expectedOutcome": "Complete host workflow functional",
+      "failureCondition": "Any step fails",
+      "testData": null
+    }
+  ],
+  "testExecution": {
+    "critical_priority": "Must pass - core functionality",
+    "high_priority": "Should pass - important features",
+    "medium_priority": "Good to pass - enhances user experience",
+    "low_priority": "Nice to have - optional features"
+  },
+  "testEnvironment": {
+    "base_url": "https://123airbnb-style-app-for-the-libyan-market.launchpulse.ai",
+    "browsers": ["Chrome", "Firefox", "Safari", "Edge"],
+    "viewports": {
+      "mobile": "375x667",
+      "tablet": "768x1024",
+      "desktop": "1920x1080"
+    }
+  },
+  "notes": [
+    "All tests should be run against the production URL",
+    "Test users are seeded in database - see test_users.json",
+    "Some tests require sequential execution (e.g., create before edit)",
+    "Authentication state should be managed between tests",
+    "Tests marked 'critical' must pass for application to be considered functional"
+  ]
+}

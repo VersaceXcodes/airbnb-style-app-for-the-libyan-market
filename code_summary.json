@@ -1,0 +1,512 @@
+{
+  "project_name": "Dar Libya - Airbnb-style Vacation Rental Platform",
+  "description": "A full-stack vacation rental marketplace platform for the Libyan market, featuring villa listings, bookings, messaging, and reviews",
+  "tech_stack": {
+    "frontend": [
+      "React 18.3.1",
+      "TypeScript 5.5.3",
+      "Vite 5.4.0",
+      "React Router DOM 6.26.0",
+      "TanStack React Query 5.0.0",
+      "Zustand (state management)",
+      "Redux Toolkit 2.2.7",
+      "Tailwind CSS 3.4.8",
+      "Radix UI (component library)",
+      "Framer Motion 11.5.4",
+      "Axios 1.7.7",
+      "Socket.io Client 4.7.5"
+    ],
+    "backend": [
+      "Node.js",
+      "Express 4.19.2",
+      "TypeScript 5.8.2",
+      "PostgreSQL (PGLite 0.2.4)",
+      "JWT (jsonwebtoken 9.0.2)",
+      "Zod 3.24.2 (validation)",
+      "Multer (file uploads)",
+      "Cors 2.8.5",
+      "Morgan 1.10.0 (logging)",
+      "WebSocket (ws)"
+    ],
+    "testing": [
+      "Vitest 3.2.4",
+      "Jest 29.7.0",
+      "Testing Library React 16.3.0",
+      "Supertest 6.3.3"
+    ],
+    "deployment": [
+      "Fly.io Dockerfile",
+      "Environment variables",
+      "PostgreSQL database"
+    ]
+  },
+  "architecture": {
+    "pattern": "Monorepo with separate frontend and backend",
+    "frontend_location": "/app/vitereact",
+    "backend_location": "/app/backend",
+    "state_management": "Zustand with persistence",
+    "authentication": "JWT Bearer Token",
+    "real_time": "Socket.io for messaging and notifications",
+    "api_style": "REST API",
+    "database": "PostgreSQL with relational schema"
+  },
+  "database_tables": [
+    {
+      "name": "users",
+      "description": "User accounts with authentication and profile info",
+      "key_fields": ["id", "email", "phone_number", "account_type", "is_phone_verified"]
+    },
+    {
+      "name": "villas",
+      "description": "Property listings with details and pricing",
+      "key_fields": ["id", "host_id", "title", "property_type", "price_per_night", "status"]
+    },
+    {
+      "name": "amenities",
+      "description": "Available property amenities (WiFi, Pool, etc.)",
+      "key_fields": ["id", "name", "icon_name"]
+    },
+    {
+      "name": "villa_amenities",
+      "description": "Junction table linking villas to amenities",
+      "key_fields": ["villa_id", "amenity_id"]
+    },
+    {
+      "name": "photos",
+      "description": "Property photos with cover photo designation",
+      "key_fields": ["id", "villa_id", "url", "is_cover_photo", "sort_order"]
+    },
+    {
+      "name": "bookings",
+      "description": "Reservation records with status tracking",
+      "key_fields": ["id", "villa_id", "guest_id", "host_id", "status", "check_in_date", "check_out_date"]
+    },
+    {
+      "name": "availability",
+      "description": "Daily availability calendar for properties",
+      "key_fields": ["id", "villa_id", "date", "status"]
+    },
+    {
+      "name": "messages",
+      "description": "Threaded messaging between hosts and guests",
+      "key_fields": ["id", "thread_id", "sender_id", "receiver_id", "booking_id"]
+    },
+    {
+      "name": "reviews",
+      "description": "Two-way blind review system",
+      "key_fields": ["id", "booking_id", "reviewer_id", "reviewee_id", "public_rating", "is_visible"]
+    }
+  ],
+  "api_endpoints": [
+    {
+      "category": "Authentication",
+      "endpoints": [
+        "POST /api/auth/register",
+        "POST /api/auth/login",
+        "POST /api/auth/verify-otp",
+        "POST /api/auth/forgot-password",
+        "POST /api/auth/reset-password"
+      ]
+    },
+    {
+      "category": "User Management",
+      "endpoints": [
+        "GET /api/users/me",
+        "PATCH /api/users/me",
+        "GET /api/users/:user_id",
+        "GET /api/users/me/listings",
+        "GET /api/users/me/trips"
+      ]
+    },
+    {
+      "category": "Villa Management",
+      "endpoints": [
+        "GET /api/villas",
+        "POST /api/villas",
+        "GET /api/villas/:villa_id",
+        "PATCH /api/villas/:villa_id",
+        "DELETE /api/villas/:villa_id"
+      ]
+    },
+    {
+      "category": "Photos",
+      "endpoints": [
+        "GET /api/villas/:villa_id/photos",
+        "POST /api/villas/:villa_id/photos",
+        "PATCH /api/photos/:photo_id",
+        "DELETE /api/photos/:photo_id"
+      ]
+    },
+    {
+      "category": "Amenities",
+      "endpoints": [
+        "GET /api/amenities",
+        "GET /api/villas/:villa_id/amenities",
+        "POST /api/villas/:villa_id/amenities",
+        "DELETE /api/villas/:villa_id/amenities"
+      ]
+    },
+    {
+      "category": "Availability",
+      "endpoints": [
+        "GET /api/villas/:villa_id/availability",
+        "PATCH /api/villas/:villa_id/availability"
+      ]
+    },
+    {
+      "category": "Bookings",
+      "endpoints": [
+        "GET /api/bookings",
+        "POST /api/bookings",
+        "GET /api/bookings/:booking_id",
+        "PATCH /api/bookings/:booking_id"
+      ]
+    },
+    {
+      "category": "Messaging",
+      "endpoints": [
+        "GET /api/messages",
+        "GET /api/messages/:thread_id",
+        "POST /api/messages/:thread_id",
+        "PATCH /api/messages/:message_id/read"
+      ]
+    },
+    {
+      "category": "Reviews",
+      "endpoints": [
+        "POST /api/reviews",
+        "PATCH /api/reviews/:review_id"
+      ]
+    },
+    {
+      "category": "Health",
+      "endpoints": [
+        "GET /api/health"
+      ]
+    }
+  ],
+  "features": [
+    {
+      "name": "User Authentication & Registration",
+      "description": "Phone-based authentication with OTP verification, login, and password reset",
+      "files": [
+        "backend/server.ts (lines 174-413)",
+        "vitereact/src/components/views/UV_Login.tsx",
+        "vitereact/src/components/views/UV_SignUp.tsx",
+        "vitereact/src/components/views/UV_PasswordReset.tsx",
+        "vitereact/src/store/main.tsx"
+      ],
+      "user_roles": ["guest", "host"],
+      "key_features": [
+        "Email or phone number login",
+        "JWT token authentication",
+        "OTP phone verification",
+        "Password reset flow",
+        "Persistent authentication state"
+      ]
+    },
+    {
+      "name": "Property Search & Filtering",
+      "description": "Advanced search with multiple filters for finding vacation rentals",
+      "files": [
+        "backend/server.ts (lines 603-744)",
+        "vitereact/src/components/views/UV_Homepage.tsx",
+        "vitereact/src/components/views/UV_SearchResults.tsx"
+      ],
+      "key_features": [
+        "Location-based search",
+        "Date range filtering",
+        "Guest capacity filter",
+        "Price range filter",
+        "Property type filter",
+        "Amenities filter",
+        "Bedroom/bathroom count filter",
+        "Availability checking"
+      ]
+    },
+    {
+      "name": "Property Listings",
+      "description": "Detailed property information with photos, amenities, and pricing",
+      "files": [
+        "backend/server.ts (lines 800-852)",
+        "vitereact/src/components/views/UV_ListingDetails.tsx"
+      ],
+      "key_features": [
+        "Multiple photos with cover photo",
+        "Property description and rules",
+        "Amenities list",
+        "Pricing and fees",
+        "Host information",
+        "Reviews and ratings",
+        "Availability calendar"
+      ]
+    },
+    {
+      "name": "Booking System",
+      "description": "Complete booking flow from request to confirmation",
+      "files": [
+        "backend/server.ts (lines 1372-1675)",
+        "vitereact/src/components/views/UV_BookingConfirmation.tsx",
+        "vitereact/src/components/views/UV_TripDetails.tsx"
+      ],
+      "key_features": [
+        "Booking request creation",
+        "Date conflict checking",
+        "Minimum nights validation",
+        "Price calculation (base + cleaning fee)",
+        "Status management (pending, confirmed, cancelled)",
+        "Host approval flow",
+        "Check-in instructions",
+        "Cancellation handling"
+      ]
+    },
+    {
+      "name": "Host Dashboard",
+      "description": "Property and booking management for hosts",
+      "files": [
+        "backend/server.ts (lines 532-553, 746-944)",
+        "vitereact/src/components/views/UV_HostDashboard.tsx",
+        "vitereact/src/components/views/UV_CreateListing.tsx"
+      ],
+      "key_features": [
+        "View all listings",
+        "Create new listings",
+        "Edit existing listings",
+        "Delete listings",
+        "Manage photos",
+        "Set amenities",
+        "Update availability calendar",
+        "View and manage bookings",
+        "Accept/decline booking requests"
+      ]
+    },
+    {
+      "name": "Guest Dashboard",
+      "description": "Trip management and booking history for guests",
+      "files": [
+        "backend/server.ts (lines 555-596)",
+        "vitereact/src/components/views/UV_UserProfile.tsx"
+      ],
+      "key_features": [
+        "View upcoming trips",
+        "View past trips",
+        "Trip details and confirmation",
+        "Host contact information",
+        "Check-in instructions",
+        "Cancel bookings"
+      ]
+    },
+    {
+      "name": "Messaging System",
+      "description": "Real-time communication between hosts and guests",
+      "files": [
+        "backend/server.ts (lines 1682-1838)",
+        "vitereact/src/components/views/UV_Inbox.tsx",
+        "vitereact/src/store/main.tsx (socket integration)"
+      ],
+      "key_features": [
+        "Threaded conversations",
+        "Real-time message delivery via Socket.io",
+        "Unread message tracking",
+        "Booking context in messages",
+        "Mark messages as read"
+      ]
+    },
+    {
+      "name": "Review System",
+      "description": "Two-way blind review system between hosts and guests",
+      "files": [
+        "backend/server.ts (lines 1845-1991)",
+        "vitereact/src/components/views/UV_SubmitReview.tsx"
+      ],
+      "key_features": [
+        "Post-booking review submission",
+        "5-star rating system",
+        "Public comments",
+        "Private feedback",
+        "Blind review (visible only after both submit)",
+        "Review visibility control"
+      ]
+    },
+    {
+      "name": "User Profiles",
+      "description": "User profile management and public host profiles",
+      "files": [
+        "backend/server.ts (lines 420-530)",
+        "vitereact/src/components/views/UV_UserProfile.tsx",
+        "vitereact/src/components/views/UV_HostPublicProfile.tsx"
+      ],
+      "key_features": [
+        "Profile picture",
+        "Edit profile information",
+        "Phone verification status",
+        "Public host profiles",
+        "Host listings display",
+        "Join date and verified badge"
+      ]
+    },
+    {
+      "name": "Photo Management",
+      "description": "Upload and manage property photos",
+      "files": [
+        "backend/server.ts (lines 950-1135)"
+      ],
+      "key_features": [
+        "Multiple photo upload",
+        "Cover photo designation",
+        "Photo ordering",
+        "Photo descriptions",
+        "Delete photos",
+        "File storage system"
+      ]
+    },
+    {
+      "name": "Availability Calendar",
+      "description": "Daily availability tracking for properties",
+      "files": [
+        "backend/server.ts (lines 1267-1365)"
+      ],
+      "key_features": [
+        "Date-specific availability",
+        "Available/blocked/booked status",
+        "Date range queries",
+        "Automatic booking sync",
+        "Host manual blocking"
+      ]
+    },
+    {
+      "name": "Navigation & Layout",
+      "description": "Responsive navigation and page layouts",
+      "files": [
+        "vitereact/src/components/views/GV_TopNavigation.tsx",
+        "vitereact/src/components/views/GV_Footer.tsx",
+        "vitereact/src/App.tsx"
+      ],
+      "key_features": [
+        "Responsive top navigation",
+        "User menu",
+        "Authentication state display",
+        "Footer with links",
+        "Protected route handling",
+        "Multiple layout types"
+      ]
+    }
+  ],
+  "key_workflows": {
+    "guest_booking_flow": [
+      "1. Browse homepage or search for properties",
+      "2. View property details and check availability",
+      "3. Select dates and guest count",
+      "4. Create booking request (authentication required)",
+      "5. Wait for host confirmation",
+      "6. Receive check-in instructions",
+      "7. Complete stay",
+      "8. Submit review"
+    ],
+    "host_listing_flow": [
+      "1. Create account as host",
+      "2. Navigate to Create Listing",
+      "3. Fill in property details",
+      "4. Upload photos",
+      "5. Select amenities",
+      "6. Set pricing and availability",
+      "7. Publish listing",
+      "8. Receive and manage booking requests",
+      "9. Communicate with guests",
+      "10. Submit review after guest checkout"
+    ],
+    "messaging_flow": [
+      "1. Guest or host initiates conversation",
+      "2. Messages linked to booking context",
+      "3. Real-time delivery via Socket.io",
+      "4. Notification of new messages",
+      "5. Thread history maintained"
+    ]
+  },
+  "security_features": [
+    "JWT token authentication",
+    "Phone verification",
+    "Ownership validation for CRUD operations",
+    "Protected API endpoints",
+    "CORS configuration",
+    "SQL injection prevention (parameterized queries)",
+    "Input validation with Zod schemas"
+  ],
+  "development_notes": {
+    "password_storage": "Plain text in development (should use bcrypt in production)",
+    "otp_verification": "Mock implementation (requires SMS service integration)",
+    "file_uploads": "Local storage (should use cloud storage in production)",
+    "socket_authentication": "Implemented but server-side handler may need WebSocket implementation",
+    "environment_variables": "Configured via .env files",
+    "database_initialization": "SQL seed data in backend/db.sql"
+  },
+  "frontend_routes": {
+    "public": [
+      "/ - Homepage with search",
+      "/search - Search results",
+      "/listing/:villa_id - Property details",
+      "/profile/:host_id - Public host profile",
+      "/login - Login page",
+      "/signup - Registration page",
+      "/reset-password - Password reset"
+    ],
+    "protected": [
+      "/booking/request/:villa_id - Booking confirmation",
+      "/trip/:booking_id - Trip details",
+      "/inbox/:thread_id - Messaging",
+      "/profile - User profile",
+      "/host/listing/new - Create listing",
+      "/host/dashboard - Host dashboard"
+    ]
+  },
+  "ui_components": {
+    "shadcn_components": [
+      "Button",
+      "Input",
+      "Card",
+      "Dialog",
+      "Dropdown",
+      "Select",
+      "Tabs",
+      "Toast",
+      "Calendar",
+      "Avatar",
+      "Badge",
+      "Form",
+      "Table",
+      "Accordion",
+      "Alert",
+      "Carousel",
+      "Checkbox",
+      "Navigation Menu",
+      "Popover",
+      "Radio Group",
+      "Slider",
+      "Textarea",
+      "Tooltip"
+    ],
+    "custom_views": [
+      "UV_Homepage",
+      "UV_SearchResults",
+      "UV_ListingDetails",
+      "UV_BookingConfirmation",
+      "UV_TripDetails",
+      "UV_CreateListing",
+      "UV_HostDashboard",
+      "UV_Inbox",
+      "UV_UserProfile",
+      "UV_HostPublicProfile",
+      "UV_Login",
+      "UV_SignUp",
+      "UV_PasswordReset",
+      "UV_SubmitReview",
+      "GV_TopNavigation",
+      "GV_Footer"
+    ]
+  },
+  "localization": {
+    "supported_languages": ["ar", "en"],
+    "default_language": "ar",
+    "language_switcher": "Available in UI preferences store"
+  }
+}
