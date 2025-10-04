@@ -21,7 +21,7 @@ export const createUserInputSchema = z.object({
   password_hash: z.string().min(8),
   phone_number: z.string().min(10),
   account_type: z.enum(['guest', 'host', 'admin']).default('guest'),
-  profile_picture_url: z.string().url().nullable()
+  profile_picture_url: z.string().url().nullable().optional()
 });
 
 export const updateUserInputSchema = z.object({

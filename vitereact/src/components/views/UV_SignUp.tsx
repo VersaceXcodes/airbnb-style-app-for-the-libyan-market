@@ -174,7 +174,7 @@ const UV_SignUp: React.FC = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSignUpSubmit} className="space-y-6">
+              <form onSubmit={handleSignUpSubmit} className="space-y-6" noValidate>
                 {/* Full Name */}
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">

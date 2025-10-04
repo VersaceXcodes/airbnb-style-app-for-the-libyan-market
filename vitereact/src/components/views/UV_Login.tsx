@@ -116,7 +116,7 @@ const UV_Login: React.FC = () => {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-6">
+            <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-6" noValidate>
               {/* Global Error Message */}
               {errorMessage && (
                 <div 
