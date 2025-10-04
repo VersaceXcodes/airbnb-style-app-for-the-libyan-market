@@ -188,7 +188,7 @@ const UV_SearchResults: React.FC = () => {
     }
     
     setSearchParams(newParams);
-  }, [priceRange, selectedTypes, selectedAmenities, bedrooms, bathrooms, searchParams, setSearchParams]);
+  }, [priceRange, selectedTypes, selectedAmenities, bedrooms, bathrooms, setSearchParams]);
 
   // Debounced filter updates
   useEffect(() => {
@@ -367,7 +367,7 @@ const UV_SearchResults: React.FC = () => {
                     onChange={(e) => setBedrooms(parseInt(e.target.value))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="0">{language === 'ar' : 'Any' ? 'أي' : 'Any'}</option>
+                    <option value="0">{language === 'ar' ? 'أي' : 'Any'}</option>
                     {[1, 2, 3, 4, 5].map(num => (
                       <option key={num} value={num}>{num}+</option>
                     ))}

@@ -262,13 +262,11 @@ export const bookingSchema = z.object({
 export const createBookingInputSchema = z.object({
   villa_id: z.string(),
   guest_id: z.string(),
-  host_id: z.string(),
   check_in_date: z.coerce.date(),
   check_out_date: z.coerce.date(),
   num_guests: z.number().int().positive(),
-  total_price: z.number().positive(),
   guest_message: z.string().min(1),
-  check_in_instructions: z.string().nullable()
+  check_in_instructions: z.string().nullable().optional()
 }).refine((data) => data.check_out_date > data.check_in_date, {
   message: "Check-out date must be after check-in date"
 });

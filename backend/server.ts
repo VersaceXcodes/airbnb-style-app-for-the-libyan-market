@@ -600,9 +600,32 @@ app.get('/api/villas', async (req, res) => {
       amenities,
       bedrooms,
       bathrooms,
-      limit = 10,
-      offset = 0
+      limit = '10',
+      offset = '0'
     } = req.query;
+
+    // Coerce query parameters to proper types with fallbacks
+    const limitInt = parseInt(limit as string);
+    const parsedLimit = Math.min(isNaN(limitInt) ? 10 : limitInt, 50); // Cap at 50
+    
+    const offsetInt = parseInt(offset as string);
+    const parsedOffset = Math.max(isNaN(offsetInt) ? 0 : offsetInt, 0);
+    
+    // Only use valid parsed values, skip invalid ones (check for NaN)
+    const numGuestsInt = parseInt(num_guests as string);
+    const parsedNumGuests = num_guests && !isNaN(numGuestsInt) && numGuestsInt > 0 ? numGuestsInt : undefined;
+    
+    const priceMinFloat = parseFloat(price_min as string);
+    const parsedPriceMin = price_min && !isNaN(priceMinFloat) && priceMinFloat >= 0 ? priceMinFloat : undefined;
+    
+    const priceMaxFloat = parseFloat(price_max as string);
+    const parsedPriceMax = price_max && !isNaN(priceMaxFloat) && priceMaxFloat >= 0 ? priceMaxFloat : undefined;
+    
+    const bedroomsInt = parseInt(bedrooms as string);
+    const parsedBedrooms = bedrooms && !isNaN(bedroomsInt) && bedroomsInt >= 0 ? bedroomsInt : undefined;
+    
+    const bathroomsInt = parseInt(bathrooms as string);
+    const parsedBathrooms = bathrooms && !isNaN(bathroomsInt) && bathroomsInt >= 0 ? bathroomsInt : undefined;
 
     const client = await pool.connect();
     
@@ -629,21 +652,21 @@ app.get('/api/villas', async (req, res) => {
       paramCount++;
     }
 
-    if (num_guests) {
+    if (parsedNumGuests) {
       query += ` AND v.num_guests >= $${paramCount}`;
-      params.push(parseInt(num_guests));
+      params.push(parsedNumGuests);
       paramCount++;
     }
 
-    if (price_min) {
+    if (parsedPriceMin) {
       query += ` AND v.price_per_night >= $${paramCount}`;
-      params.push(parseFloat(price_min));
+      params.push(parsedPriceMin);
       paramCount++;
     }
 
-    if (price_max) {
+    if (parsedPriceMax) {
       query += ` AND v.price_per_night <= $${paramCount}`;
-      params.push(parseFloat(price_max));
+      params.push(parsedPriceMax);
       paramCount++;
     }
 
@@ -654,15 +677,15 @@ app.get('/api/villas', async (req, res) => {
       paramCount++;
     }
 
-    if (bedrooms) {
+    if (parsedBedrooms) {
       query += ` AND v.num_bedrooms >= $${paramCount}`;
-      params.push(parseInt(bedrooms));
+      params.push(parsedBedrooms);
       paramCount++;
     }
 
-    if (bathrooms) {
+    if (parsedBathrooms) {
       query += ` AND v.num_bathrooms >= $${paramCount}`;
-      params.push(parseInt(bathrooms));
+      params.push(parsedBathrooms);
       paramCount++;
     }
 
@@ -693,7 +716,7 @@ app.get('/api/villas', async (req, res) => {
     }
 
     query += ` ORDER BY v.created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
-    params.push(parseInt(limit), parseInt(offset));
+    params.push(parsedLimit, parsedOffset);
 
     const result = await client.query(query, params);
     
@@ -1335,7 +1358,14 @@ app.patch('/api/villas/:villa_id/availability', authenticateToken, async (req, r
 // GET /api/bookings - Get user's bookings (as host or guest)
 app.get('/api/bookings', authenticateToken, async (req, res) => {
   try {
-    const { status, limit = 10, offset = 0 } = req.query;
+    const { status, limit = '10', offset = '0' } = req.query;
+    
+    // Coerce query parameters to proper types
+    const limitInt = parseInt(limit as string);
+    const parsedLimit = Math.min(isNaN(limitInt) ? 10 : limitInt, 50); // Cap at 50
+    
+    const offsetInt = parseInt(offset as string);
+    const parsedOffset = Math.max(isNaN(offsetInt) ? 0 : offsetInt, 0);
 
     const client = await pool.connect();
     
@@ -1369,7 +1399,7 @@ app.get('/api/bookings', authenticateToken, async (req, res) => {
     }
 
     query += ` ORDER BY b.created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
-    params.push(parseInt(limit), parseInt(offset));
+    params.push(parsedLimit, parsedOffset);
 
     const result = await client.query(query, params);
     

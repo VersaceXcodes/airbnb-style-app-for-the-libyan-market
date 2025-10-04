@@ -24,27 +24,27 @@
   "license": "ISC",
   "dependencies": {
     "@electric-sql/pglite": "^0.2.4",
+    "@types/bcrypt": "*",
     "@types/bcryptjs": "^2.4.6",
+    "@types/multer": "*",
+    "@types/nodemailer": "*",
+    "@types/ws": "*",
+    "bcrypt": "*",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "helmet": "*",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "multer": "*",
+    "nodemailer": "*",
     "pg": "^8.13.3",
     "ts-node": "^10.9.2",
     "uuid": "*",
-    "yaml": "^2.5.0",
-    "zod": "^3.24.2",
-    "multer": "*",
     "ws": "*",
-    "@types/ws": "*",
-    "nodemailer": "*",
-    "@types/nodemailer": "*",
-    "helmet": "*",
-    "bcrypt": "*",
-    "@types/bcrypt": "*",
-    "@types/multer": "*"
+    "yaml": "^2.5.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -62,7 +62,7 @@
     "nodemon": "^3.1.4",
     "supertest": "^6.3.3",
     "ts-jest": "^29.4.0",
-    "tsx": "^4.7.1",
+    "tsx": "^4.20.6",
     "typescript": "^5.8.2"
   }
 }
