@@ -222,7 +222,7 @@ const UV_Inbox: React.FC = () => {
         });
       }
     }
-  }, [activeThread?.messages, currentUser, selectedThreadId, authToken, queryClient]);
+  }, [activeThread, currentUser, selectedThreadId, authToken, queryClient]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

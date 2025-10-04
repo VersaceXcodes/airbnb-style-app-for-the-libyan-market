@@ -138,7 +138,7 @@ export const useAppStore = create<AppState>()(
       
       // Auth Actions
       login_user: async (identifier: string, password: string) => {
-        set((_state) => ({
+        set(() => ({
           authentication_state: {
             ...get().authentication_state,
             authentication_status: {
@@ -158,7 +158,7 @@ export const useAppStore = create<AppState>()(
 
           const { user, token } = response.data;
 
-          set((_state) => ({
+          set(() => ({
             authentication_state: {
               current_user: user,
               auth_token: token,
@@ -175,7 +175,7 @@ export const useAppStore = create<AppState>()(
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || error.message || 'Login failed';
           
-          set((_state) => ({
+          set(() => ({
             authentication_state: {
               current_user: null,
               auth_token: null,
@@ -194,7 +194,7 @@ export const useAppStore = create<AppState>()(
         // Disconnect socket first
         get().disconnect_socket();
         
-        set((_state) => ({
+        set(() => ({
           authentication_state: {
             current_user: null,
             auth_token: null,
@@ -208,7 +208,7 @@ export const useAppStore = create<AppState>()(
       },
       
       register_user: async (user_data) => {
-        set((_state) => ({
+        set(() => ({
           authentication_state: {
             ...get().authentication_state,
             authentication_status: {
@@ -228,7 +228,7 @@ export const useAppStore = create<AppState>()(
 
           const { user, token } = response.data;
 
-          set((_state) => ({
+          set(() => ({
             authentication_state: {
               current_user: user,
               auth_token: token,
@@ -240,12 +240,11 @@ export const useAppStore = create<AppState>()(
             },
           }));
 
-          // Initialize socket after successful registration
           get().initialize_socket();
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
           
-          set((_state) => ({
+          set(() => ({
             authentication_state: {
               current_user: null,
               auth_token: null,
@@ -271,7 +270,7 @@ export const useAppStore = create<AppState>()(
           // Update user verification status
           const { current_user } = get().authentication_state;
           if (current_user) {
-            set((_state) => ({
+            set(() => ({
               authentication_state: {
                 ...get().authentication_state,
                 current_user: {
@@ -292,7 +291,7 @@ export const useAppStore = create<AppState>()(
         const token = authentication_state.auth_token;
         
         if (!token) {
-          set((_state) => ({
+          set(() => ({
             authentication_state: {
               ...get().authentication_state,
               authentication_status: {
@@ -312,7 +311,7 @@ export const useAppStore = create<AppState>()(
 
           const user = response.data;
           
-          set((_state) => ({
+          set(() => ({
             authentication_state: {
               current_user: user,
               auth_token: token,
@@ -326,9 +325,9 @@ export const useAppStore = create<AppState>()(
 
           // Initialize socket after successful auth check
           get().initialize_socket();
-        } catch (error) {
+        } catch {
           // Token is invalid, clear auth state
-          set((_state) => ({
+          set(() => ({
             authentication_state: {
               current_user: null,
               auth_token: null,
@@ -343,7 +342,7 @@ export const useAppStore = create<AppState>()(
       },
       
       clear_auth_error: () => {
-        set((_state) => ({
+        set(() => ({
           authentication_state: {
             ...get().authentication_state,
             error_message: null,
@@ -370,7 +369,7 @@ export const useAppStore = create<AppState>()(
 
           const updated_user = response.data;
           
-          set((_state) => ({
+          set(() => ({
             authentication_state: {
               ...get().authentication_state,
               current_user: updated_user,
@@ -384,7 +383,7 @@ export const useAppStore = create<AppState>()(
       
       // Search Actions
       update_search_filters: (filters) => {
-        set((_state) => ({
+        set(() => ({
           current_search_filters: {
             ...get().current_search_filters,
             ...filters,
@@ -411,7 +410,7 @@ export const useAppStore = create<AppState>()(
       
       // UI Actions
       set_language: (language) => {
-        set((_state) => ({
+        set(() => ({
           ui_preferences: {
             ...get().ui_preferences,
             preferred_language: language,
@@ -421,7 +420,7 @@ export const useAppStore = create<AppState>()(
       
       // Notification Actions
       update_unread_count: (count) => {
-        set((_state) => ({
+        set(() => ({
           notification_state: {
             ...get().notification_state,
             unread_count: count,
@@ -430,7 +429,7 @@ export const useAppStore = create<AppState>()(
       },
       
       mark_notifications_checked: () => {
-        set((_state) => ({
+        set(() => ({
           notification_state: {
             ...get().notification_state,
             last_checked: new Date().toISOString(),
@@ -456,7 +455,7 @@ export const useAppStore = create<AppState>()(
         );
 
         socket.on('connect', () => {
-          set((_state) => ({
+          set(() => ({
             realtime_state: {
               ...get().realtime_state,
               is_connected: true,
@@ -465,7 +464,7 @@ export const useAppStore = create<AppState>()(
         });
 
         socket.on('disconnect', () => {
-          set((_state) => ({
+          set(() => ({
             realtime_state: {
               ...get().realtime_state,
               is_connected: false,
@@ -473,18 +472,17 @@ export const useAppStore = create<AppState>()(
           }));
         });
 
-        socket.on('message_received', (_data) => {
+        socket.on('message_received', () => {
           // Update unread count
           const { unread_count } = get().notification_state;
           get().update_unread_count(unread_count + 1);
         });
 
-        socket.on('booking_status_updated', (data) => {
-          // Handle booking updates
-          console.log('Booking status updated:', data);
+        socket.on('booking_status_updated', () => {
+          // Handle booking updates - could refresh queries here
         });
 
-        set((_state) => ({
+        set(() => ({
           realtime_state: {
             socket,
             is_connected: socket.connected,
@@ -497,7 +495,7 @@ export const useAppStore = create<AppState>()(
         
         if (socket) {
           socket.disconnect();
-          set((_state) => ({
+          set(() => ({
             realtime_state: {
               socket: null,
               is_connected: false,

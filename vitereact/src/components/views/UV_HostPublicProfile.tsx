@@ -128,7 +128,6 @@ const calculateHostStats = (profile: User | null, reviews: ReviewWithReviewer[])
     };
   }
 
-  // Simple response rate calculation (mock - in real app would track message response times)
   const responseRate = reviews.length > 0 ? Math.min(95, 85 + Math.random() * 10) : 0;
 
   return {

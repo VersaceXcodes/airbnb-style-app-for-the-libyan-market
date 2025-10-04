@@ -172,7 +172,7 @@ const UV_UserProfile: React.FC = () => {
               villa_title: villa.title,
               reviewee_name: reviewee.name
             };
-          } catch (error) {
+          } catch {
             return review;
           }
         })

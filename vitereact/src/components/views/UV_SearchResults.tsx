@@ -155,7 +155,7 @@ const UV_SearchResults: React.FC = () => {
     }
     
     setSearchParams(newParams);
-  }, [priceRange, selectedTypes, selectedAmenities, bedrooms, bathrooms, setSearchParams]);
+  }, [priceRange, selectedTypes, selectedAmenities, bedrooms, bathrooms, searchParams, setSearchParams]);
 
   // Debounced filter updates
   useEffect(() => {

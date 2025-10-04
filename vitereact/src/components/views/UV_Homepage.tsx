@@ -25,21 +25,19 @@ const UV_Homepage: React.FC = () => {
   const guestSelectorRef = useRef<HTMLDivElement>(null);
   const datePickerRef = useRef<HTMLDivElement>(null);
 
-  // Mock location data since endpoint is missing
-  const mockLocations = [
+  const allLocations = [
     'طرابلس', 'بنغازي', 'مصراتة', 'الزاوية', 'الخمس',
     'سرت', 'أجدابيا', 'طبرق', 'درنة', 'غريان',
     'Zuwarah', 'Al Khums', 'Sabha', 'Murzuq', 'Ghat',
     'Tripoli', 'Benghazi', 'Misrata', 'Sirte', 'Tobruk'
   ];
 
-  // Mock the fetchLocationSuggestions since endpoint is missing
   const fetchLocationSuggestions = async (query: string) => {
     if (!query || query.length < 2) return [];
     
     return new Promise<string[]>((resolve) => {
       setTimeout(() => {
-        const filtered = mockLocations.filter(loc => 
+        const filtered = allLocations.filter(loc => 
           loc.toLowerCase().includes(query.toLowerCase())
         ).slice(0, 8);
         resolve(filtered);

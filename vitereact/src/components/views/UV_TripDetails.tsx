@@ -51,8 +51,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   isHost
 }) => {
   const [message, setMessage] = useState('');
-  const reasonState = isHost ? useState('') : [undefined, undefined];
-  const [reason, setReason] = reasonState as [string, React.Dispatch<React.SetStateAction<string>>];
+  const [reason, setReason] = useState('');
 
   if (!isOpen) return null;
 

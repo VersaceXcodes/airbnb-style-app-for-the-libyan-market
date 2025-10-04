@@ -58,33 +58,13 @@ const UV_HostDashboard: React.FC = () => {
 
   const queryClient = useQueryClient();
 
-  // Check if user is a host
-  if (!currentUser || currentUser.account_type !== 'host') {
-    return (
-      <>
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-            <p className="text-gray-600">This page is only available to hosts.</p>
-            <Link 
-              to="/"
-              className="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Go Home
-            </Link>
-          </div>
-        </div>
-      </>
-    );
-  }
-
   // Fetch bookings for the host
   const { 
     data: bookings = [], 
     isLoading: bookingsLoading, 
     error: bookingsError 
   } = useQuery({
-    queryKey: ['host-bookings', currentUser.id],
+    queryKey: ['host-bookings', currentUser?.id],
     queryFn: async (): Promise<EnrichedBooking[]> => {
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/bookings`,
@@ -128,10 +108,31 @@ const UV_HostDashboard: React.FC = () => {
 
       return enrichedBookings;
     },
-    enabled: !!currentUser?.id && !!authToken,
+    enabled: !!currentUser?.id && !!authToken && currentUser?.account_type === 'host',
     staleTime: 60000,
     refetchOnWindowFocus: false,
     retry: 1
+  });
+
+  // Mutation for updating booking status
+  const updateBookingMutation = useMutation({
+    mutationFn: async ({ bookingId, status }: { bookingId: string; status: string }) => {
+      const response = await axios.patch(
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/bookings/${bookingId}`,
+        { status },
+        {
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      // Refresh bookings data
+      queryClient.invalidateQueries({ queryKey: ['host-bookings', currentUser?.id] });
+    }
   });
 
   // Calculate summary stats from bookings
@@ -159,26 +160,25 @@ const UV_HostDashboard: React.FC = () => {
     return stats;
   }, [bookings]);
 
-  // Mutation for updating booking status
-  const updateBookingMutation = useMutation({
-    mutationFn: async ({ bookingId, status }: { bookingId: string; status: string }) => {
-      const response = await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/bookings/${bookingId}`,
-        { status },
-        {
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      // Refresh bookings data
-      queryClient.invalidateQueries({ queryKey: ['host-bookings', currentUser.id] });
-    }
-  });
+  // Check if user is a host
+  if (!currentUser || currentUser.account_type !== 'host') {
+    return (
+      <>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+            <p className="text-gray-600">This page is only available to hosts.</p>
+            <Link 
+              to="/"
+              className="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Go Home
+            </Link>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   const handleAcceptBooking = (bookingId: string) => {
     updateBookingMutation.mutate({ bookingId, status: 'confirmed' });
