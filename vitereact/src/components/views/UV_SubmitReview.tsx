@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { useAppStore } from '@/store/main';
 
 // Types
 interface BookingContext {
@@ -48,8 +47,8 @@ const UV_SubmitReview: React.FC<UV_SubmitReviewProps> = ({ isOpen, onClose, book
   const [privateFeedback, setPrivateFeedback] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   
-  // State from store
-  const authToken = useAppStore(state => state.authentication_state.auth_token);
+  // State from store (unused but kept for future use)
+  // const authToken = useAppStore(state => state.authentication_state.auth_token);
   
   // React Query mutation
   const submitReviewMutation = useMutation({
@@ -103,8 +102,8 @@ const UV_SubmitReview: React.FC<UV_SubmitReviewProps> = ({ isOpen, onClose, book
       reviewer_id: bookingData.reviewer_id,
       reviewee_id: bookingData.reviewee_id,
       public_rating: rating,
-      public_comment: publicComment || null,
-      private_feedback: privateFeedback || null,
+      public_comment: publicComment || undefined,
+      private_feedback: privateFeedback || undefined,
     });
   };
   
@@ -220,7 +219,7 @@ const UV_SubmitReview: React.FC<UV_SubmitReviewProps> = ({ isOpen, onClose, book
                 onChange={handlePublicCommentChange}
                 placeholder="Share your experience with other guests (this will be visible publicly)"
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-colors duration-200 resize-none"
-                disabled={submitReviewMutation.isLoading}
+                disabled={submitReviewMutation.isPending}
               />
               <p className="mt-1 text-xs text-gray-500">
                 This will be visible on the listing and host profile
@@ -239,7 +238,7 @@ const UV_SubmitReview: React.FC<UV_SubmitReviewProps> = ({ isOpen, onClose, book
                 onChange={handlePrivateFeedbackChange}
                 placeholder="Any sensitive feedback for the Dar Libya team (this will not be shared publicly)"
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-colors duration-200 resize-none"
-                disabled={submitReviewMutation.isLoading}
+                disabled={submitReviewMutation.isPending}
               />
               <p className="mt-1 text-xs text-gray-500">
                 This is only visible to the Dar Libya support team
@@ -267,17 +266,17 @@ const UV_SubmitReview: React.FC<UV_SubmitReviewProps> = ({ isOpen, onClose, book
               <button
                 type="button"
                 onClick={onClose}
-                disabled={submitReviewMutation.isLoading}
+                disabled={submitReviewMutation.isPending}
                 className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                disabled={submitReviewMutation.isLoading}
+                disabled={submitReviewMutation.isPending}
                 className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                {submitReviewMutation.isLoading ? (
+                {submitReviewMutation.isPending ? (
                   <>
                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

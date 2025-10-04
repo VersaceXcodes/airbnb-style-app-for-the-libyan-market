@@ -53,7 +53,7 @@ const GV_Footer: React.FC = () => {
     ],
   };
 
-  const handleInternalNavigation = (url: string) => {
+  const handleInternalNavigation = () => {
     // 内部导航由React Router的Link组件处理
     // 不需要额外逻辑
   };
@@ -81,7 +81,7 @@ const GV_Footer: React.FC = () => {
                     <li key={link.label}>
                       <Link
                         to={link.url}
-                        onClick={() => handleInternalNavigation(link.url)}
+                        onClick={() => handleInternalNavigation()}
                         className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
                         aria-label={`Learn more about ${link.label}`}
                       >
@@ -105,7 +105,7 @@ const GV_Footer: React.FC = () => {
                       <li key={link.label}>
                         <Link
                           to={link.url}
-                          onClick={() => handleInternalNavigation(link.url)}
+                          onClick={() => handleInternalNavigation()}
                           className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
                           aria-label={`Discover ${link.label}`}
                         >
@@ -131,7 +131,7 @@ const GV_Footer: React.FC = () => {
                     <li key={link.label}>
                       <Link
                         to={link.url}
-                        onClick={() => handleInternalNavigation(link.url)}
+                        onClick={() => handleInternalNavigation()}
                         className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
                         aria-label={`Start ${link.label}`}
                       >
@@ -154,7 +154,7 @@ const GV_Footer: React.FC = () => {
                     <li key={link.label}>
                       <Link
                         to={link.url}
-                        onClick={() => handleInternalNavigation(link.url)}
+                        onClick={() => handleInternalNavigation()}
                         className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
                         aria-label={`Get ${link.label}`}
                       >
@@ -207,7 +207,7 @@ const GV_Footer: React.FC = () => {
                       <li key={link.label}>
                         <Link
                           to={link.url}
-                          onClick={() => handleInternalNavigation(link.url)}
+                          onClick={() => handleInternalNavigation()}
                           className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
                           aria-label={`View ${link.label}`}
                         >
@@ -223,7 +223,7 @@ const GV_Footer: React.FC = () => {
               <div className="flex items-center">
                 <Link
                   to="/"
-                  onClick={() => handleInternalNavigation('/')}
+                  onClick={() => handleInternalNavigation()}
                   className="text-white font-bold text-xl hover:text-blue-400 transition-colors duration-200"
                   aria-label="Dar Libya homepage"
                 >

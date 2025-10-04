@@ -51,7 +51,7 @@ const GV_TopNavigation: React.FC = () => {
         return { count: 0 };
       }
     },
-    enabled: authenticated && !!currentUser?.id,
+    enabled: isAuthenticated && !!currentUser?.id,
     refetchInterval: 30000, // Poll every 30 seconds
     staleTime: 25000,
   });

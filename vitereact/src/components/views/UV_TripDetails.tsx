@@ -51,7 +51,8 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   isHost
 }) => {
   const [message, setMessage] = useState('');
-  const [reason, setReason] = isHost ? useState('') : undefined;
+  const reasonState = isHost ? useState('') : [undefined, undefined];
+  const [reason, setReason] = reasonState as [string, React.Dispatch<React.SetStateAction<string>>];
 
   if (!isOpen) return null;
 
@@ -137,7 +138,7 @@ const UV_TripDetails: React.FC = () => {
     data: booking,
     isLoading,
     error,
-    refetch
+    // refetch
   } = useQuery({
     queryKey: ['booking', booking_id],
     queryFn: async () => {
@@ -166,7 +167,7 @@ const UV_TripDetails: React.FC = () => {
   );
   
   const isHost = booking && currentUser?.id === booking.host_id;
-  const isGuest = booking && currentUser?.id === booking.guest_id;
+  // const isGuest = booking && currentUser?.id === booking.guest_id;
 
   // Accept booking mutation
   const acceptBookingMutation = useMutation({
@@ -625,7 +626,7 @@ const UV_TripDetails: React.FC = () => {
         onClose={() => setShowCancellationModal(false)}
         onConfirm={booking.status === 'pending' && isHost ? handleDeclineBooking : handleCancelBooking}
         isCancelling={declineBookingMutation.isPending || cancelBookingMutation.isPending}
-        isHost={booking.status === 'pending' && isHost}
+        isHost={!!(booking.status === 'pending' && isHost)}
       />
     </>
   );

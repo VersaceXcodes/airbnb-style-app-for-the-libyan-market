@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAppStore } from '@/store/main';
-import axios from 'axios';
 import { Search, MapPin, Calendar, Users, Globe, Home, ChevronDown } from 'lucide-react';
 
 const UV_Homepage: React.FC = () => {

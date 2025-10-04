@@ -462,14 +462,14 @@ const UV_HostDashboard: React.FC = () => {
                             <div className="flex space-x-2">
                               <button
                                 onClick={() => handleAcceptBooking(booking.id)}
-                                disabled={updateBookingMutation.isLoading}
+                                disabled={updateBookingMutation.isPending}
                                 className="text-green-600 hover:text-green-900 disabled:opacity-50"
                               >
                                 Accept
                               </button>
                               <button
                                 onClick={() => handleDeclineBooking(booking.id)}
-                                disabled={updateBookingMutation.isLoading}
+                                disabled={updateBookingMutation.isPending}
                                 className="text-red-600 hover:text-red-900 disabled:opacity-50"
                               >
                                 Decline

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { useAppStore } from '@/store/main';
 import { CreateVillaInput, Amenity, Villa } from '@/types/zod';
-import { MapPin, Upload, Calendar, Home, Wifi, Car, Tv, Wind, Droplets, ChefHat, BookOpen, X, Plus, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { MapPin, Upload, Home, Wifi, Car, Tv, Wind, Droplets, ChefHat, BookOpen, X, Check, AlertCircle, Loader2 } from 'lucide-react';
 
 interface PhotoData {
   file: File;
@@ -16,7 +16,6 @@ interface PhotoData {
 
 const UV_CreateListing: React.FC = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   // Auth state - CRITICAL: Individual selectors
   const currentUser = useAppStore(state => state.authentication_state.current_user);
@@ -298,7 +297,7 @@ const UV_CreateListing: React.FC = () => {
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              {steps.map((step, index) => (
+              {steps.map((_step, index) => (
                 <div key={index} className="flex items-center">
                   <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
                     currentStep > index + 1
@@ -699,7 +698,7 @@ const UV_CreateListing: React.FC = () => {
                         const date = new Date();
                         date.setDate(date.getDate() - date.getDay() + i);
                         const isBlocked = blockedDates.some(d => d.toDateString() === date.toDateString());
-                        const isPast = date < new Date().setHours(0, 0, 0, 0);
+                        const isPast = date.getTime() < new Date().setHours(0, 0, 0, 0);
                         
                         return (
                           <button
@@ -901,10 +900,10 @@ const UV_CreateListing: React.FC = () => {
               
               <button
                 onClick={currentStep === 9 ? handleSubmit : nextStep}
-                disabled={isSubmitting || createVillaMutation.isLoading}
+                disabled={isSubmitting || createVillaMutation.isPending}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
               >
-                {isSubmitting || createVillaMutation.isLoading ? (
+                {isSubmitting || createVillaMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     {currentStep === 9 ? 'Publishing...' : 'Loading...'}

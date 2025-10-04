@@ -84,8 +84,8 @@ const UV_ListingDetails: React.FC = () => {
   
   // Global state
   const currentUser = useAppStore(state => state.authentication_state.current_user);
-  const searchFilters = useAppStore(state => state.current_search_filters);
-  const updateSearchFilters = useAppStore(state => state.update_search_filters);
+  // const searchFilters = useAppStore(state => state.current_search_filters);
+  // const updateSearchFilters = useAppStore(state => state.update_search_filters);
 
   // Local state for booking widget
   const [bookingDates, setBookingDates] = useState({
@@ -152,10 +152,10 @@ const UV_ListingDetails: React.FC = () => {
     navigate(`/inbox`);
   };
 
-  const formatDate = (date: Date | null) => {
-    if (!date) return '';
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  };
+  // const formatDate = (date: Date | null) => {
+  //   if (!date) return '';
+  //   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  // };
 
   const calculateTotalPrice = () => {
     if (!villaData || !bookingDates.check_in || !bookingDates.check_out) return 0;

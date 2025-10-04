@@ -1,10 +1,66 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { useAppStore } from '@/store/main';
 import axios from 'axios';
-import { User, Villa, Photo, Review } from '@/store/main';
-import { Star, MapPin, Calendar, CheckCircle, Home, MessageSquare, User as UserIcon, Clock } from 'lucide-react';
+import { Star, MapPin, Calendar, CheckCircle, Home, MessageSquare, User as UserIcon } from 'lucide-react';
+
+// Import types from store
+interface User {
+  id: string;
+  name: string;
+  email: string | null;
+  phone_number: string;
+  account_type: 'guest' | 'host' | 'admin';
+  is_phone_verified: boolean;
+  profile_picture_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Villa {
+  id: string;
+  host_id: string;
+  title: string;
+  description: string | null;
+  property_type: string;
+  num_guests: number;
+  num_bedrooms: number;
+  num_beds: number;
+  num_bathrooms: number;
+  price_per_night: number;
+  cleaning_fee: number | null;
+  minimum_nights: number;
+  house_rules: string | null;
+  preferred_payment_method: string;
+  exact_address: string | null;
+  directions_landmarks: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Photo {
+  id: string;
+  villa_id: string;
+  url: string;
+  description: string | null;
+  is_cover_photo: boolean;
+  sort_order: number;
+  uploaded_at: string;
+}
+
+interface Review {
+  id: string;
+  booking_id: string;
+  reviewer_id: string;
+  reviewee_id: string;
+  public_rating: number;
+  public_comment: string | null;
+  private_feedback: string | null;
+  created_at: string;
+}
 
 // API base URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
@@ -108,8 +164,8 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
 const UV_HostPublicProfile: React.FC = () => {
   const { host_id } = useParams<{ host_id: string }>();
   
-  // Get current user from global store (optional)
-  const currentUser = useAppStore(state => state.authentication_state.current_user);
+  // Get current user from global store (optional, unused but kept for future use)
+  // const currentUser = useAppStore(state => state.authentication_state.current_user);
 
   // Fetch host profile
   const { data: hostProfile, isLoading: profileLoading, error: profileError } = useQuery({
@@ -123,7 +179,7 @@ const UV_HostPublicProfile: React.FC = () => {
   // Fetch host listings
   const { data: listings, isLoading: listingsLoading, error: listingsError } = useQuery({
     queryKey: ['hostListings', host_id],
-    queryFn: fetchHostListings,
+    queryFn: () => fetchHostListings(host_id!),
     enabled: !!host_id,
     staleTime: 5 * 60 * 1000,
     retry: 1
@@ -150,7 +206,7 @@ const UV_HostPublicProfile: React.FC = () => {
   // Fetch host reviews
   const { data: reviews, isLoading: reviewsLoading, error: reviewsError } = useQuery({
     queryKey: ['hostReviews', host_id],
-    queryFn: fetchHostReviews,
+    queryFn: () => fetchHostReviews(host_id!),
     enabled: !!host_id,
     staleTime: 5 * 60 * 1000,
     retry: 1

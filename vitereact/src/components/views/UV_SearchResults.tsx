@@ -4,40 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useAppStore } from '@/store/main';
 
-// Types from Zod schemas
-interface Villa {
-  id: string;
-  host_id: string;
-  title: string;
-  description: string | null;
-  property_type: string;
-  num_guests: number;
-  num_bedrooms: number;
-  num_beds: number;
-  num_bathrooms: number;
-  price_per_night: number;
-  cleaning_fee: number | null;
-  minimum_nights: number;
-  house_rules: string | null;
-  preferred_payment_method: string;
-  exact_address: string | null;
-  directions_landmarks: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  cover_photo_url?: string;
-  host_name?: string;
-  avg_rating?: number;
-  review_count?: number;
-}
-
-interface Amenity {
-  id: string;
-  name: string;
-  icon_name: string | null;
-}
+// Types from Zod schemas (defined locally, but not directly used due to type inference)
 
 const UV_SearchResults: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -55,7 +22,7 @@ const UV_SearchResults: React.FC = () => {
   const location = searchParams.get('location') || '';
   const checkIn = searchParams.get('check_in');
   const checkOut = searchParams.get('check_out');
-  const numGuests = searchParams.get('num_guests') || '1';
+  // const numGuests = searchParams.get('num_guests') || '1';
   const priceMin = searchParams.get('price_min');
   const priceMax = searchParams.get('price_max');
   const propertyTypes = searchParams.get('property_types');
@@ -129,7 +96,7 @@ const UV_SearchResults: React.FC = () => {
   // Initialize filter states from URL params
   useEffect(() => {
     if (priceMin || priceMax) {
-      setPriceRange([parseInt(priceMin) || 0, parseInt(priceMax) || 10000]);
+      setPriceRange([parseInt(priceMin || '0') || 0, parseInt(priceMax || '10000') || 10000]);
     }
     if (propertyTypes) {
       setSelectedTypes(propertyTypes.split(','));

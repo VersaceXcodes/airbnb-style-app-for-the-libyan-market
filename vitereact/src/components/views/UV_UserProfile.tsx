@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { useAppStore } from '@/store/main';
-import { Camera, Edit2, Home, MapPin, Calendar, Star, MessageCircle, Settings, Check } from 'lucide-react';
+import { Camera, Edit2, Home, Calendar, Star, MessageCircle, Settings, Check } from 'lucide-react';
 
 // Type definitions
 interface User {

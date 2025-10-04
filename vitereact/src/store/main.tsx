@@ -138,11 +138,11 @@ export const useAppStore = create<AppState>()(
       
       // Auth Actions
       login_user: async (identifier: string, password: string) => {
-        set((state) => ({
+        set((_state) => ({
           authentication_state: {
-            ...state.authentication_state,
+            ...get().authentication_state,
             authentication_status: {
-              ...state.authentication_state.authentication_status,
+              ...get().authentication_state.authentication_status,
               is_loading: true,
             },
             error_message: null,
@@ -158,7 +158,7 @@ export const useAppStore = create<AppState>()(
 
           const { user, token } = response.data;
 
-          set((state) => ({
+          set((_state) => ({
             authentication_state: {
               current_user: user,
               auth_token: token,
@@ -175,7 +175,7 @@ export const useAppStore = create<AppState>()(
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || error.message || 'Login failed';
           
-          set((state) => ({
+          set((_state) => ({
             authentication_state: {
               current_user: null,
               auth_token: null,
@@ -194,7 +194,7 @@ export const useAppStore = create<AppState>()(
         // Disconnect socket first
         get().disconnect_socket();
         
-        set((state) => ({
+        set((_state) => ({
           authentication_state: {
             current_user: null,
             auth_token: null,
@@ -208,11 +208,11 @@ export const useAppStore = create<AppState>()(
       },
       
       register_user: async (user_data) => {
-        set((state) => ({
+        set((_state) => ({
           authentication_state: {
-            ...state.authentication_state,
+            ...get().authentication_state,
             authentication_status: {
-              ...state.authentication_state.authentication_status,
+              ...get().authentication_state.authentication_status,
               is_loading: true,
             },
             error_message: null,
@@ -228,7 +228,7 @@ export const useAppStore = create<AppState>()(
 
           const { user, token } = response.data;
 
-          set((state) => ({
+          set((_state) => ({
             authentication_state: {
               current_user: user,
               auth_token: token,
@@ -245,7 +245,7 @@ export const useAppStore = create<AppState>()(
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
           
-          set((state) => ({
+          set((_state) => ({
             authentication_state: {
               current_user: null,
               auth_token: null,
@@ -271,9 +271,9 @@ export const useAppStore = create<AppState>()(
           // Update user verification status
           const { current_user } = get().authentication_state;
           if (current_user) {
-            set((state) => ({
+            set((_state) => ({
               authentication_state: {
-                ...state.authentication_state,
+                ...get().authentication_state,
                 current_user: {
                   ...current_user,
                   is_phone_verified: true,
@@ -292,11 +292,11 @@ export const useAppStore = create<AppState>()(
         const token = authentication_state.auth_token;
         
         if (!token) {
-          set((state) => ({
+          set((_state) => ({
             authentication_state: {
-              ...state.authentication_state,
+              ...get().authentication_state,
               authentication_status: {
-                ...state.authentication_state.authentication_status,
+                ...get().authentication_state.authentication_status,
                 is_loading: false,
               },
             },
@@ -312,7 +312,7 @@ export const useAppStore = create<AppState>()(
 
           const user = response.data;
           
-          set((state) => ({
+          set((_state) => ({
             authentication_state: {
               current_user: user,
               auth_token: token,
@@ -328,7 +328,7 @@ export const useAppStore = create<AppState>()(
           get().initialize_socket();
         } catch (error) {
           // Token is invalid, clear auth state
-          set((state) => ({
+          set((_state) => ({
             authentication_state: {
               current_user: null,
               auth_token: null,
@@ -343,9 +343,9 @@ export const useAppStore = create<AppState>()(
       },
       
       clear_auth_error: () => {
-        set((state) => ({
+        set((_state) => ({
           authentication_state: {
-            ...state.authentication_state,
+            ...get().authentication_state,
             error_message: null,
           },
         }));
@@ -370,9 +370,9 @@ export const useAppStore = create<AppState>()(
 
           const updated_user = response.data;
           
-          set((state) => ({
+          set((_state) => ({
             authentication_state: {
-              ...state.authentication_state,
+              ...get().authentication_state,
               current_user: updated_user,
             },
           }));
@@ -384,9 +384,9 @@ export const useAppStore = create<AppState>()(
       
       // Search Actions
       update_search_filters: (filters) => {
-        set((state) => ({
+        set((_state) => ({
           current_search_filters: {
-            ...state.current_search_filters,
+            ...get().current_search_filters,
             ...filters,
           },
         }));
@@ -411,9 +411,9 @@ export const useAppStore = create<AppState>()(
       
       // UI Actions
       set_language: (language) => {
-        set((state) => ({
+        set((_state) => ({
           ui_preferences: {
-            ...state.ui_preferences,
+            ...get().ui_preferences,
             preferred_language: language,
           },
         }));
@@ -421,18 +421,18 @@ export const useAppStore = create<AppState>()(
       
       // Notification Actions
       update_unread_count: (count) => {
-        set((state) => ({
+        set((_state) => ({
           notification_state: {
-            ...state.notification_state,
+            ...get().notification_state,
             unread_count: count,
           },
         }));
       },
       
       mark_notifications_checked: () => {
-        set((state) => ({
+        set((_state) => ({
           notification_state: {
-            ...state.notification_state,
+            ...get().notification_state,
             last_checked: new Date().toISOString(),
           },
         }));
@@ -456,24 +456,24 @@ export const useAppStore = create<AppState>()(
         );
 
         socket.on('connect', () => {
-          set((state) => ({
+          set((_state) => ({
             realtime_state: {
-              ...state.realtime_state,
+              ...get().realtime_state,
               is_connected: true,
             },
           }));
         });
 
         socket.on('disconnect', () => {
-          set((state) => ({
+          set((_state) => ({
             realtime_state: {
-              ...state.realtime_state,
+              ...get().realtime_state,
               is_connected: false,
             },
           }));
         });
 
-        socket.on('message_received', (data) => {
+        socket.on('message_received', (_data) => {
           // Update unread count
           const { unread_count } = get().notification_state;
           get().update_unread_count(unread_count + 1);
@@ -484,7 +484,7 @@ export const useAppStore = create<AppState>()(
           console.log('Booking status updated:', data);
         });
 
-        set((state) => ({
+        set((_state) => ({
           realtime_state: {
             socket,
             is_connected: socket.connected,
@@ -497,7 +497,7 @@ export const useAppStore = create<AppState>()(
         
         if (socket) {
           socket.disconnect();
-          set((state) => ({
+          set((_state) => ({
             realtime_state: {
               socket: null,
               is_connected: false,

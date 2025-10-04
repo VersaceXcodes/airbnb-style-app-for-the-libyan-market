@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
 const UV_PasswordReset: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   
   // State management
   const [current_step, setCurrentStep] = useState<number>(1);
