@@ -122,7 +122,8 @@ INSERT INTO users (id, name, email, password_hash, phone_number, account_type, i
 ('user_005', 'David Brown', 'david.brown@email.com', 'password123', '+1234567894', 'host', true, 'https://picsum.photos/seed/user005/200/200.jpg', '2024-01-19T16:45:00Z', '2024-01-19T16:45:00Z'),
 ('user_006', 'Emily Davis', 'emily.davis@email.com', 'password123', '+1234567895', 'guest', true, NULL, '2024-01-20T08:30:00Z', '2024-01-20T08:30:00Z'),
 ('user_007', 'Robert Wilson', 'robert.wilson@email.com', 'user123', '+1234567896', 'guest', true, 'https://picsum.photos/seed/user007/200/200.jpg', '2024-01-21T12:10:00Z', '2024-01-21T12:10:00Z'),
-('user_008', 'Lisa Anderson', 'lisa.anderson@email.com', 'password123', '+1234567897', 'host', true, 'https://picsum.photos/seed/user008/200/200.jpg', '2024-01-22T17:25:00Z', '2024-01-22T17:25:00Z');
+('user_008', 'Lisa Anderson', 'lisa.anderson@email.com', 'password123', '+1234567897', 'host', true, 'https://picsum.photos/seed/user008/200/200.jpg', '2024-01-22T17:25:00Z', '2024-01-22T17:25:00Z')
+ON CONFLICT (id) DO NOTHING;
 
 -- Villas table
 INSERT INTO villas (id, host_id, title, description, property_type, num_guests, num_bedrooms, num_beds, num_bathrooms, price_per_night, cleaning_fee, minimum_nights, house_rules, preferred_payment_method, exact_address, directions_landmarks, latitude, longitude, status, created_at, updated_at) VALUES
@@ -131,7 +132,8 @@ INSERT INTO villas (id, host_id, title, description, property_type, num_guests, 
 ('villa_003', 'user_005', 'Modern Downtown Loft', 'Stylish modern loft in the heart of downtown. Walking distance to restaurants, shops, and entertainment venues.', 'apartment', 4, 2, 2, 2, 200.00, 75.00, 1, 'No loud music after 11 PM. No smoking. Additional guests must be approved in advance.', 'credit_card', '789 Market Street, Downtown, NY', 'Entrance is on the side of the building. Ring apartment 4B.', 40.7589, -73.9851, 'listed', '2024-01-19T10:00:00Z', '2024-01-19T10:00:00Z'),
 ('villa_004', 'user_001', 'Tropical Paradise Villa', 'Your own private oasis in the midst of lush tropical gardens. Private pool and outdoor kitchen make this the perfect vacation spot.', 'villa', 10, 5, 6, 4, 580.00, 200.00, 5, 'No children under 10. No glassware near the pool. Respect quiet hours.', 'bank_transfer', '321 Palm Avenue, Key West, FL', 'Look for the white gates with tropical plants. Free parking on premises.', 24.5551, -81.7800, 'listed', '2024-01-20T16:00:00Z', '2024-01-22T14:45:00Z'),
 ('villa_005', 'user_008', 'Countryside Farmhouse', 'Authentic farmhouse experience on working organic farm. Fresh eggs and vegetables included. Children welcome to help with farm chores.', 'farmhouse', 8, 4, 5, 3, 220.00, 80.00, 2, 'No smoking in the barn. Respect farm animals. Children must be supervised.', 'cash', '567 Country Lane, Vermont', 'Take Route 7 North for 15 miles, turn right at the red barn.', 44.4759, -73.2121, 'listed', '2024-01-22T09:00:00Z', '2024-01-22T11:30:00Z'),
-('villa_006', 'user_002', 'Lakeside Cottage with Dock', 'Beautiful cottage right on the lake with private dock for fishing and boating. Perfect getaway for nature lovers.', 'cottage', 6, 3, 3, 2, 195.00, 60.00, 2, 'Fishing license required. Life jackets must be worn on boats. No motor boats after sunset.', 'paypal', '888 Lakeshore Drive, Lake Tahoe, CA', 'Follow the lake road north for 5 miles from the town center.', 39.0968, -120.0324, 'draft', '2024-01-18T13:00:00Z', '2024-01-18T13:00:00Z');
+('villa_006', 'user_002', 'Lakeside Cottage with Dock', 'Beautiful cottage right on the lake with private dock for fishing and boating. Perfect getaway for nature lovers.', 'cottage', 6, 3, 3, 2, 195.00, 60.00, 2, 'Fishing license required. Life jackets must be worn on boats. No motor boats after sunset.', 'paypal', '888 Lakeshore Drive, Lake Tahoe, CA', 'Follow the lake road north for 5 miles from the town center.', 39.0968, -120.0324, 'draft', '2024-01-18T13:00:00Z', '2024-01-18T13:00:00Z')
+ON CONFLICT (id) DO NOTHING;
 
 -- Amenities table
 INSERT INTO amenities (id, name, icon_name) VALUES
@@ -154,7 +156,8 @@ INSERT INTO amenities (id, name, icon_name) VALUES
 ('amenity_017', 'Mountain View', 'mountain'),
 ('amenity_018', 'Lake Access', 'lake'),
 ('amenity_019', 'Free Parking', 'free_parking'),
-('amenity_020', 'Garden', 'garden');
+('amenity_020', 'Garden', 'garden')
+ON CONFLICT (id) DO NOTHING;
 
 -- Villa Amenities junction table
 INSERT INTO villa_amenities (villa_id, amenity_id) VALUES
@@ -180,7 +183,8 @@ INSERT INTO villa_amenities (villa_id, amenity_id) VALUES
 ('villa_005', 'amenity_013'), ('villa_005', 'amenity_020'),
     
 ('villa_006', 'amenity_001'), ('villa_006', 'amenity_006'), ('villa_006', 'amenity_008'),
-('villa_006', 'amenity_018'), ('villa_006', 'amenity_019');
+('villa_006', 'amenity_018'), ('villa_006', 'amenity_019')
+ON CONFLICT (villa_id, amenity_id) DO NOTHING;
 
 -- Photos table
 INSERT INTO photos (id, villa_id, url, description, is_cover_photo, sort_order, created_at) VALUES
@@ -207,7 +211,8 @@ INSERT INTO photos (id, villa_id, url, description, is_cover_photo, sort_order, 
 ('photo_017', 'villa_005', 'https://picsum.photos/seed/villa5farm/1200/800.jpg', 'View of the organic farm', false, 1, '2024-01-22T09:31:00Z'),
 
 ('photo_018', 'villa_006', 'https://picsum.photos/seed/villa6cover/1200/800.jpg', 'Cottage by the lake', true, 0, '2024-01-18T13:30:00Z'),
-('photo_019', 'villa_006', 'https://picsum.photos/seed/villa6dock/1200/800.jpg', 'Private dock for fishing', false, 1, '2024-01-18T13:31:00Z');
+('photo_019', 'villa_006', 'https://picsum.photos/seed/villa6dock/1200/800.jpg', 'Private dock for fishing', false, 1, '2024-01-18T13:31:00Z')
+ON CONFLICT (id) DO NOTHING;
 
 -- Bookings table
 INSERT INTO bookings (id, villa_id, guest_id, host_id, check_in_date, check_out_date, num_guests, total_price, status, guest_message, cancellation_reason, cancellation_message, check_in_instructions, created_at, updated_at) VALUES
@@ -217,7 +222,8 @@ INSERT INTO bookings (id, villa_id, guest_id, host_id, check_in_date, check_out_
 ('booking_004', 'villa_004', 'user_007', 'user_001', '2024-05-15', '2024-05-25', 8, 6000.00, 'confirmed', 'Our annual family reunion! Is the pool heated?', NULL, NULL, 'Use the intercom at the gate. Our property manager will meet you.', '2024-01-27T14:00:00Z', '2024-01-28T09:30:00Z'),
 ('booking_005', 'villa_002', 'user_006', 'user_002', '2024-02-14', '2024-02-17', 4, 990.00, 'cancelled', 'We had a change of plans, sorry for the inconvenience.', 'Emergency family matter', 'We understand, hope everything is okay. Full refund processed.', NULL, '2024-01-23T18:30:00Z', '2024-01-29T10:15:00Z'),
 ('booking_006', 'villa_005', 'user_003', 'user_008', '2024-06-01', '2024-06-05', 6, 1200.00, 'confirmed', 'Kids are excited to see farm animals! Will there be farm activities?', NULL, NULL, 'Check-in at the red farmhouse door. We''ll have fresh eggs waiting!', '2024-01-30T12:45:00Z', '2024-01-30T12:45:00Z'),
-('booking_007', 'villa_003', 'user_007', 'user_008', '2024-03-01', '2024-03-04', 2, 675.00, 'confirmed', 'Just need a place to stay for a concert', NULL, NULL, 'Your code for the building is 5678. Elevator to 4th floor.', '2024-01-29T11:00:00Z', '2024-01-29T13:20:00Z');
+('booking_007', 'villa_003', 'user_007', 'user_008', '2024-03-01', '2024-03-04', 2, 675.00, 'confirmed', 'Just need a place to stay for a concert', NULL, NULL, 'Your code for the building is 5678. Elevator to 4th floor.', '2024-01-29T11:00:00Z', '2024-01-29T13:20:00Z')
+ON CONFLICT (id) DO NOTHING;
 
 -- Availability table
 INSERT INTO availability (id, villa_id, date, status) VALUES
@@ -250,7 +256,8 @@ INSERT INTO availability (id, villa_id, date, status) VALUES
 -- Villa 005 (June 2024)
 ('avail_041', 'villa_005', '2024-06-01', 'booked'), ('avail_042', 'villa_005', '2024-06-02', 'booked'),
 ('avail_043', 'villa_005', '2024-06-03', 'booked'), ('avail_044', 'villa_005', '2024-06-04', 'booked'),
-('avail_045', 'villa_005', '2024-06-05', 'booked');
+('avail_045', 'villa_005', '2024-06-05', 'booked')
+ON CONFLICT (id) DO NOTHING;
 
 -- Messages table
 INSERT INTO messages (id, thread_id, sender_id, receiver_id, content, is_read, booking_id, created_at) VALUES
@@ -266,7 +273,8 @@ INSERT INTO messages (id, thread_id, sender_id, receiver_id, content, is_read, b
 ('msg_010', 'thread_006', 'user_003', 'user_008', 'The kids are counting down the days! Can they help with feeding the chickens?', false, 'booking_006', '2024-01-30T12:45:00Z'),
 ('msg_011', 'thread_006', 'user_008', 'user_003', 'They would love that! Morning chores start at 7:30 if they''re interested.', true, 'booking_006', '2024-01-30T14:20:00Z'),
 ('msg_012', 'thread_007', 'user_007', 'user_008', 'Just confirming our booking for the concert weekend. Will we have WiFi?', false, 'booking_007', '2024-01-29T11:00:00Z'),
-('msg_013', 'thread_007', 'user_008', 'user_007', 'Yes, high-speed WiFi is included. The building is also very secure with 24/7 doorman.', true, 'booking_007', '2024-01-29T13:20:00Z');
+('msg_013', 'thread_007', 'user_008', 'user_007', 'Yes, high-speed WiFi is included. The building is also very secure with 24/7 doorman.', true, 'booking_007', '2024-01-29T13:20:00Z')
+ON CONFLICT (id) DO NOTHING;
 
 -- Reviews table
 INSERT INTO reviews (id, booking_id, reviewer_id, reviewee_id, public_rating, public_comment, private_feedback, is_visible, created_at) VALUES
@@ -277,4 +285,5 @@ INSERT INTO reviews (id, booking_id, reviewer_id, reviewee_id, public_rating, pu
 ('review_005', 'booking_006', 'user_003', 'user_008', 5, 'The kids had an amazing time at the farm! They loved helping with the morning chores and learning about farm life. The farmhouse was comfortable and had everything we needed. Fresh eggs every morning were a bonus!', 'The hosts went above and beyond to make our family feel welcome. Their knowledge of farming was fascinating.', true, '2024-06-06T14:00:00Z'),
 ('review_006', 'booking_006', 'user_008', 'user_003', 5, 'Mike and his family were perfect guests for our farm. The kids were respectful and genuinely interested in farm life. Left everything in perfect condition.', NULL, true, '2024-06-06T16:30:00Z'),
 ('review_007', 'booking_007', 'user_007', 'user_008', 4, 'Great downtown location and very secure building. The loft was exactly as described. Parking was a bit challenging but that''s typical for downtown.', 'Robert was easy to communicate with and followed all checkout instructions perfectly.', true, '2024-03-05T09:00:00Z'),
-('review_008', 'booking_007', 'user_008', 'user_007', 5, 'Robert was an excellent guest. Very quiet and respectful of the space. Would host again.', NULL, true, '2024-03-05T11:15:00Z');
+('review_008', 'booking_007', 'user_008', 'user_007', 5, 'Robert was an excellent guest. Very quiet and respectful of the space. Would host again.', NULL, true, '2024-03-05T11:15:00Z')
+ON CONFLICT (id) DO NOTHING;
