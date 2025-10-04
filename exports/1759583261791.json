@@ -1,0 +1,15 @@
+{
+  "timestamp": 1759583261791,
+  "operation": {
+    "id": "backend:specifications:asyncapi"
+  },
+  "projectId": "airbnb-style-app-for-the-libyan-market",
+  "files": [
+    {
+      "path": "../../apps/airbnb-style-app-for-the-libyan-market/backend/asyncapi.yaml",
+      "type": "text",
+      "size": 3,
+      "dependencies": false
+    }
+  ]
+}

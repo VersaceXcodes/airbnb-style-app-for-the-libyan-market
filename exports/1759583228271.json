@@ -1,0 +1,15 @@
+{
+  "timestamp": 1759583228271,
+  "operation": {
+    "id": "db:schemas:zod"
+  },
+  "projectId": "airbnb-style-app-for-the-libyan-market",
+  "files": [
+    {
+      "path": "../../apps/airbnb-style-app-for-the-libyan-market/backend/schema.ts",
+      "type": "text",
+      "size": 16260,
+      "dependencies": false
+    }
+  ]
+}

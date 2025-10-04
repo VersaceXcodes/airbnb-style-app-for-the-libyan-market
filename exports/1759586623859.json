@@ -1,0 +1,19 @@
+{
+  "timestamp": 1759586623859,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_PasswordReset",
+      "version": "latest"
+    }
+  },
+  "projectId": "airbnb-style-app-for-the-libyan-market",
+  "files": [
+    {
+      "path": "../../apps/airbnb-style-app-for-the-libyan-market/vitereact/src/components/views/UV_PasswordReset.tsx",
+      "type": "text",
+      "size": 16456,
+      "dependencies": false
+    }
+  ]
+}

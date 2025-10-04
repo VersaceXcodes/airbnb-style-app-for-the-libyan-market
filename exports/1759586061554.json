@@ -1,0 +1,21 @@
+{
+  "timestamp": 1759586061554,
+  "operation": {
+    "id": "backend:tests:main"
+  },
+  "projectId": "airbnb-style-app-for-the-libyan-market",
+  "files": [
+    {
+      "path": "../../apps/airbnb-style-app-for-the-libyan-market/backend/server.test.ts",
+      "type": "text",
+      "size": 56176,
+      "dependencies": false
+    },
+    {
+      "path": "../../apps/airbnb-style-app-for-the-libyan-market/backend/jest.config.ts",
+      "type": "text",
+      "size": 611,
+      "dependencies": false
+    }
+  ]
+}

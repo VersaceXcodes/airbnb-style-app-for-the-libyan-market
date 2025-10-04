@@ -1,0 +1,1451 @@
+openapi: 3.0.0
+info:
+  title: Dar Libya API
+  description: API for the Dar Libya short-term rental platform
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserInput"
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                  token:
+                    type: string
+        "400":
+          description: Bad request
+        "409":
+          description: User already exists
+  /auth/login:
+    post:
+      summary: Login user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - identifier
+                - password
+              properties:
+                identifier:
+                  type: string
+                  description: Phone number or email
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                  token:
+                    type: string
+        "401":
+          description: Invalid credentials
+  /auth/forgot-password:
+    post:
+      summary: Initiate password reset
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - identifier
+              properties:
+                identifier:
+                  type: string
+                  description: Phone number or email
+      responses:
+        "200":
+          description: Password reset initiated
+  /auth/reset-password:
+    post:
+      summary: Reset password
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - new_password
+              properties:
+                token:
+                  type: string
+                new_password:
+                  type: string
+      responses:
+        "200":
+          description: Password reset successful
+  /auth/verify-otp:
+    post:
+      summary: Verify OTP
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone_number
+                - otp
+              properties:
+                phone_number:
+                  type: string
+                otp:
+                  type: string
+      responses:
+        "200":
+          description: OTP verified successfully
+  /users/me:
+    get:
+      summary: Get current user profile
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    patch:
+      summary: Update current user profile
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserInput"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /users/{user_id}:
+    get:
+      summary: Get user profile by ID
+      tags:
+        - Users
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /users/me/listings:
+    get:
+      summary: Get current user's listings (for hosts)
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User's listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Villa"
+  /users/me/trips:
+    get:
+      summary: Get current user's trips (for guests)
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - upcoming
+              - past
+              - all
+            default: all
+      responses:
+        "200":
+          description: User's trips
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+  /villas:
+    get:
+      summary: Search and filter villas
+      operationId: searchVillas
+      tags:
+        - Villas
+      parameters:
+        - name: location
+          in: query
+          schema:
+            type: string
+        - name: check_in
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: check_out
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: num_guests
+          in: query
+          schema:
+            type: integer
+        - name: price_min
+          in: query
+          schema:
+            type: number
+        - name: price_max
+          in: query
+          schema:
+            type: number
+        - name: property_types
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: amenities
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: bedrooms
+          in: query
+          schema:
+            type: integer
+        - name: bathrooms
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of villas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Villa"
+    post:
+      summary: Create a new villa listing
+      operationId: createVilla
+      tags:
+        - Villas
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVillaInput"
+      responses:
+        "201":
+          description: Villa created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Villa"
+  /villas/{villa_id}:
+    get:
+      summary: Get villa details
+      operationId: getVilla
+      tags:
+        - Villas
+      parameters:
+        - name: villa_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Villa details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Villa"
+    patch:
+      summary: Update villa listing
+      operationId: updateVilla
+      tags:
+        - Villas
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: villa_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateVillaInput"
+      responses:
+        "200":
+          description: Villa updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Villa"
+    delete:
+      summary: Delete villa listing
+      operationId: deleteVilla
+      tags:
+        - Villas
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: villa_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Villa deleted
+  /villas/{villa_id}/photos:
+    get:
+      summary: Get villa photos
+      operationId: getVillaPhotos
+      tags:
+        - Photos
+      parameters:
+        - name: villa_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Villa photos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Photo"
+    post:
+      summary: Upload villa photo
+      operationId: uploadVillaPhoto
+      tags:
+        - Photos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: villa_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePhotoInput"
+      responses:
+        "201":
+          description: Photo uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Photo"
+  /photos/{photo_id}:
+    patch:
+      summary: Update photo
+      operationId: updatePhoto
+      tags:
+        - Photos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: photo_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePhotoInput"
+      responses:
+        "200":
+          description: Photo updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Photo"
+    delete:
+      summary: Delete photo
+      operationId: deletePhoto
+      tags:
+        - Photos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: photo_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Photo deleted
+  /villas/{villa_id}/amenities:
+    get:
+      summary: Get villa amenities
+      operationId: getVillaAmenities
+      tags:
+        - Amenities
+      parameters:
+        - name: villa_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Villa amenities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Amenity"
+    post:
+      summary: Add amenity to villa
+      operationId: addVillaAmenity
+      tags:
+        - Amenities
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: villa_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVillaAmenityInput"
+      responses:
+        "201":
+          description: Amenity added
+    delete:
+      summary: Remove amenity from villa
+      operationId: removeVillaAmenity
+      tags:
+        - Amenities
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: villa_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: amenity_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Amenity removed
+  /amenities:
+    get:
+      summary: Get all available amenities
+      operationId: getAllAmenities
+      tags:
+        - Amenities
+      responses:
+        "200":
+          description: List of amenities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Amenity"
+  /villas/{villa_id}/availability:
+    get:
+      summary: Get villa availability
+      operationId: getVillaAvailability
+      tags:
+        - Availability
+      parameters:
+        - name: villa_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Villa availability
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Availability"
+    patch:
+      summary: Update villa availability
+      operationId: updateVillaAvailability
+      tags:
+        - Availability
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: villa_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dates:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      date:
+                        type: string
+                        format: date
+                      status:
+                        type: string
+                        enum:
+                          - available
+                          - blocked
+      responses:
+        "200":
+          description: Availability updated
+  /bookings:
+    get:
+      summary: Get bookings
+      operationId: getBookings
+      tags:
+        - Bookings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - pending
+              - confirmed
+              - cancelled
+              - completed
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+    post:
+      summary: Create booking request
+      operationId: createBooking
+      tags:
+        - Bookings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookingInput"
+      responses:
+        "201":
+          description: Booking request created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+  /bookings/{booking_id}:
+    get:
+      summary: Get booking details
+      operationId: getBooking
+      tags:
+        - Bookings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: booking_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Booking details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+    patch:
+      summary: Update booking (accept/decline/cancel)
+      operationId: updateBooking
+      tags:
+        - Bookings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: booking_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - confirmed
+                    - cancelled
+                    - completed
+                cancellation_reason:
+                  type: string
+                cancellation_message:
+                  type: string
+                check_in_instructions:
+                  type: string
+      responses:
+        "200":
+          description: Booking updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+  /messages:
+    get:
+      summary: Get user's message threads
+      operationId: getMessageThreads
+      tags:
+        - Messages
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Message threads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    thread_id:
+                      type: string
+                    other_user:
+                      $ref: "#/components/schemas/User"
+                    last_message:
+                      $ref: "#/components/schemas/Message"
+                    unread_count:
+                      type: integer
+  /messages/{thread_id}:
+    get:
+      summary: Get messages in thread
+      operationId: getMessages
+      tags:
+        - Messages
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: thread_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      summary: Send message
+      operationId: sendMessage
+      tags:
+        - Messages
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: thread_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMessageInput"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+  /messages/{message_id}/read:
+    patch:
+      summary: Mark message as read
+      operationId: markMessageAsRead
+      tags:
+        - Messages
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: message_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Message marked as read
+  /reviews:
+    post:
+      summary: Create review
+      operationId: createReview
+      tags:
+        - Reviews
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewInput"
+      responses:
+        "201":
+          description: Review created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+  /reviews/{review_id}:
+    patch:
+      summary: Update review
+      operationId: updateReview
+      tags:
+        - Reviews
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateReviewInput"
+      responses:
+        "200":
+          description: Review updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          nullable: true
+        password_hash:
+          type: string
+        phone_number:
+          type: string
+        account_type:
+          type: string
+          enum:
+            - guest
+            - host
+            - admin
+        is_phone_verified:
+          type: boolean
+        profile_picture_url:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateUserInput:
+      type: object
+      required:
+        - name
+        - password_hash
+        - phone_number
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          nullable: true
+        password_hash:
+          type: string
+          minLength: 8
+        phone_number:
+          type: string
+          minLength: 10
+        account_type:
+          type: string
+          enum:
+            - guest
+            - host
+          default: guest
+        profile_picture_url:
+          type: string
+          format: uri
+          nullable: true
+    UpdateUserInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          nullable: true
+        phone_number:
+          type: string
+          minLength: 10
+        profile_picture_url:
+          type: string
+          format: uri
+          nullable: true
+        is_phone_verified:
+          type: boolean
+    Villa:
+      type: object
+      properties:
+        id:
+          type: string
+        host_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        property_type:
+          type: string
+          enum:
+            - villa
+            - cabin
+            - apartment
+            - cottage
+            - farmhouse
+            - house
+        num_guests:
+          type: integer
+        num_bedrooms:
+          type: integer
+        num_beds:
+          type: integer
+        num_bathrooms:
+          type: integer
+        price_per_night:
+          type: number
+        cleaning_fee:
+          type: number
+          nullable: true
+        minimum_nights:
+          type: integer
+          default: 1
+        house_rules:
+          type: string
+          nullable: true
+        preferred_payment_method:
+          type: string
+          enum:
+            - credit_card
+            - paypal
+            - bank_transfer
+            - cash
+        exact_address:
+          type: string
+          nullable: true
+        directions_landmarks:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        status:
+          type: string
+          enum:
+            - draft
+            - listed
+            - unlisted
+          default: draft
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateVillaInput:
+      type: object
+      required:
+        - title
+        - property_type
+        - num_guests
+        - num_bedrooms
+        - num_beds
+        - num_bathrooms
+        - price_per_night
+        - preferred_payment_method
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        property_type:
+          type: string
+          enum:
+            - villa
+            - cabin
+            - apartment
+            - cottage
+            - farmhouse
+            - house
+        num_guests:
+          type: integer
+          minimum: 1
+        num_bedrooms:
+          type: integer
+          minimum: 0
+        num_beds:
+          type: integer
+          minimum: 0
+        num_bathrooms:
+          type: integer
+          minimum: 0
+        price_per_night:
+          type: number
+          minimum: 0
+        cleaning_fee:
+          type: number
+          minimum: 0
+          nullable: true
+        minimum_nights:
+          type: integer
+          minimum: 1
+          default: 1
+        house_rules:
+          type: string
+          nullable: true
+        preferred_payment_method:
+          type: string
+          enum:
+            - credit_card
+            - paypal
+            - bank_transfer
+            - cash
+        exact_address:
+          type: string
+          nullable: true
+        directions_landmarks:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
+          nullable: true
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+          nullable: true
+    UpdateVillaInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        property_type:
+          type: string
+          enum:
+            - villa
+            - cabin
+            - apartment
+            - cottage
+            - farmhouse
+            - house
+        num_guests:
+          type: integer
+          minimum: 1
+        num_bedrooms:
+          type: integer
+          minimum: 0
+        num_beds:
+          type: integer
+          minimum: 0
+        num_bathrooms:
+          type: integer
+          minimum: 0
+        price_per_night:
+          type: number
+          minimum: 0
+        cleaning_fee:
+          type: number
+          minimum: 0
+          nullable: true
+        minimum_nights:
+          type: integer
+          minimum: 1
+        house_rules:
+          type: string
+          nullable: true
+        preferred_payment_method:
+          type: string
+          enum:
+            - credit_card
+            - paypal
+            - bank_transfer
+            - cash
+        exact_address:
+          type: string
+          nullable: true
+        directions_landmarks:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
+          nullable: true
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+          nullable: true
+        status:
+          type: string
+          enum:
+            - draft
+            - listed
+            - unlisted
+    Photo:
+      type: object
+      properties:
+        id:
+          type: string
+        villa_id:
+          type: string
+        url:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_cover_photo:
+          type: boolean
+          default: false
+        sort_order:
+          type: integer
+          default: 0
+        created_at:
+          type: string
+          format: date-time
+    CreatePhotoInput:
+      type: object
+      required:
+        - url
+      properties:
+        villa_id:
+          type: string
+        url:
+          type: string
+          format: uri
+        description:
+          type: string
+          nullable: true
+        is_cover_photo:
+          type: boolean
+          default: false
+        sort_order:
+          type: integer
+          minimum: 0
+          default: 0
+    UpdatePhotoInput:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        description:
+          type: string
+          nullable: true
+        is_cover_photo:
+          type: boolean
+        sort_order:
+          type: integer
+          minimum: 0
+    Amenity:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        icon_name:
+          type: string
+          nullable: true
+    CreateVillaAmenityInput:
+      type: object
+      required:
+        - amenity_id
+      properties:
+        villa_id:
+          type: string
+        amenity_id:
+          type: string
+    Availability:
+      type: object
+      properties:
+        id:
+          type: string
+        villa_id:
+          type: string
+        date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+            - available
+            - booked
+            - blocked
+          default: available
+    Booking:
+      type: object
+      properties:
+        id:
+          type: string
+        villa_id:
+          type: string
+        guest_id:
+          type: string
+        host_id:
+          type: string
+        check_in_date:
+          type: string
+          format: date-time
+        check_out_date:
+          type: string
+          format: date-time
+        num_guests:
+          type: integer
+        total_price:
+          type: number
+        status:
+          type: string
+          enum:
+            - confirmed
+            - pending
+            - cancelled
+            - completed
+        guest_message:
+          type: string
+        cancellation_reason:
+          type: string
+          nullable: true
+        cancellation_message:
+          type: string
+          nullable: true
+        check_in_instructions:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateBookingInput:
+      type: object
+      required:
+        - villa_id
+        - check_in_date
+        - check_out_date
+        - num_guests
+        - guest_message
+      properties:
+        villa_id:
+          type: string
+        guest_id:
+          type: string
+        host_id:
+          type: string
+        check_in_date:
+          type: string
+          format: date-time
+        check_out_date:
+          type: string
+          format: date-time
+        num_guests:
+          type: integer
+          minimum: 1
+        total_price:
+          type: number
+          minimum: 0
+        guest_message:
+          type: string
+          minLength: 1
+        check_in_instructions:
+          type: string
+          nullable: true
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        thread_id:
+          type: string
+        sender_id:
+          type: string
+        receiver_id:
+          type: string
+        content:
+          type: string
+        is_read:
+          type: boolean
+          default: false
+        booking_id:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    CreateMessageInput:
+      type: object
+      required:
+        - receiver_id
+        - content
+      properties:
+        thread_id:
+          type: string
+        receiver_id:
+          type: string
+        content:
+          type: string
+          minLength: 1
+        booking_id:
+          type: string
+          nullable: true
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+        booking_id:
+          type: string
+        reviewer_id:
+          type: string
+        reviewee_id:
+          type: string
+        public_rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        public_comment:
+          type: string
+          nullable: true
+        private_feedback:
+          type: string
+          nullable: true
+        is_visible:
+          type: boolean
+          default: false
+        created_at:
+          type: string
+          format: date-time
+    CreateReviewInput:
+      type: object
+      required:
+        - booking_id
+        - reviewer_id
+        - reviewee_id
+        - public_rating
+      properties:
+        booking_id:
+          type: string
+        reviewer_id:
+          type: string
+        reviewee_id:
+          type: string
+        public_rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        public_comment:
+          type: string
+          nullable: true
+        private_feedback:
+          type: string
+          nullable: true
+    UpdateReviewInput:
+      type: object
+      properties:
+        public_comment:
+          type: string
+          nullable: true
+        private_feedback:
+          type: string
+          nullable: true
+        is_visible:
+          type: boolean
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,19 @@
+{
+  "timestamp": 1759586649176,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_UserProfile",
+      "version": "1759586315746"
+    }
+  },
+  "projectId": "airbnb-style-app-for-the-libyan-market",
+  "files": [
+    {
+      "path": "../../apps/airbnb-style-app-for-the-libyan-market/vitereact/src/components/views/UV_UserProfile.tsx",
+      "type": "text",
+      "size": 28380,
+      "dependencies": false
+    }
+  ]
+}

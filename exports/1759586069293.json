@@ -1,0 +1,15 @@
+{
+  "timestamp": 1759586069293,
+  "operation": {
+    "id": "settings:config:package"
+  },
+  "projectId": "airbnb-style-app-for-the-libyan-market",
+  "files": [
+    {
+      "path": "../../apps/airbnb-style-app-for-the-libyan-market/backend/package.json",
+      "type": "text",
+      "size": 1605,
+      "dependencies": true
+    }
+  ]
+}

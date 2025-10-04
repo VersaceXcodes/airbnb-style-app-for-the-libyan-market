@@ -1,0 +1,15 @@
+{
+  "timestamp": 1759586645316,
+  "operation": {
+    "id": "settings:config:package"
+  },
+  "projectId": "airbnb-style-app-for-the-libyan-market",
+  "files": [
+    {
+      "path": "../../apps/airbnb-style-app-for-the-libyan-market/vitereact/package.json",
+      "type": "text",
+      "size": 2979,
+      "dependencies": true
+    }
+  ]
+}

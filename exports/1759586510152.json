@@ -1,0 +1,19 @@
+{
+  "timestamp": 1759586510152,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_TopNavigation",
+      "version": "latest"
+    }
+  },
+  "projectId": "airbnb-style-app-for-the-libyan-market",
+  "files": [
+    {
+      "path": "../../apps/airbnb-style-app-for-the-libyan-market/vitereact/src/components/views/GV_TopNavigation.tsx",
+      "type": "text",
+      "size": 19484,
+      "dependencies": false
+    }
+  ]
+}
