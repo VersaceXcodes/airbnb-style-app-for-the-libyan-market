@@ -52,6 +52,21 @@ const UV_Homepage: React.FC = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  const fetchFeaturedListings = async () => {
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+    const response = await fetch(`${apiBaseUrl}/api/villas?limit=6`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch listings');
+    }
+    return response.json();
+  };
+
+  const { data: featuredListings = [] } = useQuery({
+    queryKey: ['featuredListings'],
+    queryFn: fetchFeaturedListings,
+    staleTime: 5 * 60 * 1000,
+  });
+
   // Handle click outside for dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -407,6 +422,90 @@ const UV_Homepage: React.FC = () => {
                 >
                   <Home className="h-5 w-5 mr-2" />
                   {t.listProperty}
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          {/* Featured Listings Section */}
+          <section className="py-12 lg:py-20 bg-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                  {preferredLanguage === 'ar' ? 'إقامات مميزة' : 'Featured Stays'}
+                </h2>
+                <p className="text-lg text-gray-600">
+                  {preferredLanguage === 'ar' 
+                    ? 'اكتشف أفضل العقارات في ليبيا'
+                    : 'Discover the best properties in Libya'}
+                </p>
+              </div>
+
+              {featuredListings.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {featuredListings.map((listing: any) => (
+                    <Link
+                      key={listing.id}
+                      to={`/listing/${listing.id}`}
+                      className="group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-200"
+                    >
+                      <div className="relative h-64 w-full overflow-hidden">
+                        <img
+                          src={listing.cover_photo_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop'}
+                          alt={listing.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="p-6">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-1">
+                          {listing.title}
+                        </h3>
+                        <p className="text-gray-600 mb-4 line-clamp-2">
+                          {listing.exact_address || listing.directions_landmarks}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-2xl font-bold text-gray-900">
+                              {listing.price_per_night} {preferredLanguage === 'ar' ? 'د.ل' : 'LYD'}
+                            </span>
+                            <span className="text-gray-600">
+                              {preferredLanguage === 'ar' ? ' / ليلة' : ' / night'}
+                            </span>
+                          </div>
+                          {listing.avg_rating && (
+                            <div className="flex items-center space-x-1">
+                              <span className="text-yellow-500">★</span>
+                              <span className="font-semibold">{parseFloat(listing.avg_rating).toFixed(1)}</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="mt-4 flex items-center space-x-4 text-sm text-gray-600">
+                          <span>{listing.num_guests} {preferredLanguage === 'ar' ? 'ضيوف' : 'guests'}</span>
+                          <span>•</span>
+                          <span>{listing.num_bedrooms} {preferredLanguage === 'ar' ? 'غرف' : 'bedrooms'}</span>
+                          <span>•</span>
+                          <span>{listing.num_bathrooms} {preferredLanguage === 'ar' ? 'حمامات' : 'baths'}</span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-600 text-lg">
+                    {preferredLanguage === 'ar' 
+                      ? 'لا توجد قائمة متاحة حاليًا. تحقق مرة أخرى قريبًا!'
+                      : 'No listings available at the moment. Check back soon!'}
+                  </p>
+                </div>
+              )}
+
+              <div className="text-center mt-12">
+                <Link
+                  to="/search"
+                  className="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                >
+                  {preferredLanguage === 'ar' ? 'عرض كل القوائم' : 'View All Listings'}
                 </Link>
               </div>
             </div>
