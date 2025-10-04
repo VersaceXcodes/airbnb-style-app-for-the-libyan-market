@@ -1,13 +1,24 @@
 import request from 'supertest';
 import { jest } from '@jest/globals';
 import { app, server, pool } from './server.ts';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
+
+// Create mock functions
+const mockJwtSign = jest.fn();
+const mockJwtVerify = jest.fn();
 
 // Mock external dependencies
-jest.mock('jsonwebtoken');
+jest.mock('jsonwebtoken', () => ({
+  sign: mockJwtSign,
+  verify: mockJwtVerify,
+  decode: jest.fn()
+}));
+const mockSendMail = jest.fn<any>();
+mockSendMail.mockResolvedValue({ messageId: 'test-id' });
+
 jest.mock('nodemailer', () => ({
   createTransport: jest.fn(() => ({
-    sendMail: jest.fn().mockResolvedValue({ messageId: 'test-id' })
+    sendMail: mockSendMail
   }))
 }));
 
@@ -28,7 +39,7 @@ jest.mock('ws', () => ({
 
 // Test database setup
 const testDb = {
-  query: jest.fn(),
+  query: jest.fn() as jest.MockedFunction<any>,
   begin: jest.fn(),
   commit: jest.fn(),
   rollback: jest.fn(),
@@ -37,9 +48,9 @@ const testDb = {
 
 // Mock pool
 jest.mock('./server.ts', () => {
-  const originalModule = jest.requireActual('./server.ts');
+  const originalModule = jest.requireActual('./server.ts') as any;
   return {
-    ...originalModule,
+    ...(originalModule || {}),
     pool: {
       connect: jest.fn(() => testDb),
       query: jest.fn()
@@ -52,8 +63,8 @@ beforeEach(async () => {
   jest.clearAllMocks();
   
   // Mock successful database queries
-  testDb.query.mockImplementation((query, params) => {
-    if (query.includes('SELECT') && query.includes('users')) {
+  testDb.query.mockImplementation((query: any, params?: any) => {
+    if (String(query).includes('SELECT') && String(query).includes('users')) {
       return { rows: [{
         id: 'test-user-id',
         name: 'Test User',
@@ -157,7 +168,7 @@ describe('Authentication Endpoints', () => {
       testDb.query.mockResolvedValueOnce({ rows: [mockUser] });
       
       const mockToken = 'mock-jwt-token';
-      jwt.sign.mockReturnValue(mockToken);
+      mockJwtSign.mockReturnValue(mockToken as any);
 
       const response = await request(app)
         .post('/api/auth/login')
@@ -187,7 +198,7 @@ describe('Authentication Endpoints', () => {
       testDb.query.mockResolvedValueOnce({ rows: [mockUser] });
       
       const mockToken = 'mock-jwt-token';
-      jwt.sign.mockReturnValue(mockToken);
+      mockJwtSign.mockReturnValue(mockToken as any);
 
       const response = await request(app)
         .post('/api/auth/login')
@@ -270,7 +281,7 @@ describe('User Management Endpoints', () => {
   };
 
   beforeEach(() => {
-    jwt.verify.mockReturnValue({ userId: 'test-user-id', phone_number: '+1234567890' });
+    mockJwtVerify.mockReturnValue({ userId: 'test-user-id', phone_number: '+1234567890' } as any);
   });
 
   describe('GET /users/me', () => {
@@ -413,7 +424,7 @@ describe('Villa Management Endpoints', () => {
   };
 
   beforeEach(() => {
-    jwt.verify.mockReturnValue({ userId: 'host-001', phone_number: '+1234567890' });
+    mockJwtVerify.mockReturnValue({ userId: 'host-001', phone_number: '+1234567890' } as any);
   });
 
   describe('GET /villas', () => {
@@ -647,7 +658,7 @@ describe('Photo Management Endpoints', () => {
   };
 
   beforeEach(() => {
-    jwt.verify.mockReturnValue({ userId: 'host-001', phone_number: '+1234567890' });
+    mockJwtVerify.mockReturnValue({ userId: 'host-001', phone_number: '+1234567890' } as any);
   });
 
   describe('GET /villas/:id/photos', () => {
@@ -775,7 +786,7 @@ describe('Booking Management Endpoints', () => {
   };
 
   beforeEach(() => {
-    jwt.verify.mockReturnValue({ userId: 'guest-001', phone_number: '+1234567890' });
+    mockJwtVerify.mockReturnValue({ userId: 'guest-001', phone_number: '+1234567890' } as any);
   });
 
   describe('POST /bookings', () => {
@@ -868,7 +879,7 @@ describe('Booking Management Endpoints', () => {
         status: 'pending'
       };
 
-      jwt.verify.mockReturnValue({ userId: 'host-001', phone_number: '+1234567890' });
+      mockJwtVerify.mockReturnValue({ userId: 'host-001', phone_number: '+1234567890' } as any);
 
       testDb.query.mockResolvedValueOnce({ rows: [mockBooking] });
       testDb.query.mockResolvedValueOnce({ rows: [mockVilla] });
@@ -964,7 +975,7 @@ describe('Booking Management Endpoints', () => {
         }
       ];
 
-      jwt.verify.mockReturnValue({ userId: 'host-001', phone_number: '+1234567890' });
+      mockJwtVerify.mockReturnValue({ userId: 'host-001', phone_number: '+1234567890' } as any);
       testDb.query.mockResolvedValueOnce({ rows: [mockHost] });
       testDb.query.mockResolvedValueOnce({ rows: mockBookings });
 
@@ -1002,7 +1013,7 @@ describe('Messaging System', () => {
   };
 
   beforeEach(() => {
-    jwt.verify.mockReturnValue({ userId: 'user-001', phone_number: '+1234567890' });
+    mockJwtVerify.mockReturnValue({ userId: 'user-001', phone_number: '+1234567890' } as any);
   });
 
   describe('GET /messages', () => {
@@ -1169,7 +1180,7 @@ describe('Review System', () => {
   };
 
   beforeEach(() => {
-    jwt.verify.mockReturnValue({ userId: 'guest-001', phone_number: '+1234567890' });
+    mockJwtVerify.mockReturnValue({ userId: 'guest-001', phone_number: '+1234567890' } as any);
   });
 
   describe('POST /reviews', () => {
@@ -1303,7 +1314,7 @@ describe('Availability Management', () => {
   };
 
   beforeEach(() => {
-    jwt.verify.mockReturnValue({ userId: 'host-001', phone_number: '+1234567890' });
+    mockJwtVerify.mockReturnValue({ userId: 'host-001', phone_number: '+1234567890' } as any);
   });
 
   describe('GET /villas/:id/availability', () => {
@@ -1562,7 +1573,7 @@ describe('Error Handling', () => {
 
   describe('Authentication Errors', () => {
     it('should handle invalid JWT token', async () => {
-      jwt.verify.mockImplementationOnce(() => {
+      mockJwtVerify.mockImplementationOnce(() => {
         throw new Error('Invalid token');
       });
 
@@ -1585,7 +1596,7 @@ describe('Error Handling', () => {
 
   describe('Authorization Errors', () => {
     it('should prevent guest from accessing host endpoints', async () => {
-      jwt.verify.mockReturnValue({ userId: 'guest-001' });
+      mockJwtVerify.mockReturnValue({ userId: 'guest-001' } as any);
       testDb.query.mockResolvedValueOnce({ 
         rows: [{ id: 'guest-001', account_type: 'guest' }] 
       });
@@ -1606,7 +1617,7 @@ describe('Error Handling', () => {
     });
 
     it('should prevent non-owner from modifying resources', async () => {
-      jwt.verify.mockReturnValue({ userId: 'user-001' });
+      mockJwtVerify.mockReturnValue({ userId: 'user-001' } as any);
       testDb.query.mockResolvedValueOnce({ 
         rows: [{ id: 'villa-001', host_id: 'other-user-id' }] 
       });
@@ -1625,7 +1636,7 @@ describe('Error Handling', () => {
 describe('Performance Tests', () => {
   describe('Rate Limiting', () => {
     it('should handle multiple concurrent requests', async () => {
-      const promises = Array(10).fill().map(() =>
+      const promises = Array(10).fill(null).map(() =>
         request(app).get('/api/villas')
       );
 
@@ -1639,7 +1650,7 @@ describe('Performance Tests', () => {
 
   describe('Pagination', () => {
     it('should limit results per page', async () => {
-      const mockVillas = Array(20).fill().map((_, i) => ({
+      const mockVillas = Array(20).fill(null).map((_, i) => ({
         id: `villa-${i}`,
         title: `Villa ${i}`
       }));
@@ -1697,7 +1708,7 @@ describe('Integration Tests', () => {
         status: 'pending'
       };
 
-      jwt.verify.mockReturnValue({ userId: 'guest-001' });
+      mockJwtVerify.mockReturnValue({ userId: 'guest-001' } as any);
       testDb.query.mockResolvedValueOnce({ rows: [mockGuest] });
       testDb.query.mockResolvedValueOnce({ rows: [mockVilla] });
       testDb.query.mockResolvedValueOnce({ rows: [mockHost] });
@@ -1713,7 +1724,7 @@ describe('Integration Tests', () => {
       expect(bookingResponse.body.status).toBe('pending');
 
       // 3. Host accepts booking
-      jwt.verify.mockReturnValue({ userId: 'host-001' });
+      mockJwtVerify.mockReturnValue({ userId: 'host-001' } as any);
       testDb.query.mockResolvedValueOnce({ rows: [mockBooking] });
       testDb.query.mockResolvedValueOnce({ rows: [mockVilla] });
       testDb.query.mockResolvedValueOnce({ 
@@ -1729,7 +1740,7 @@ describe('Integration Tests', () => {
       expect(acceptResponse.body.status).toBe('confirmed');
 
       // 4. Guest views their trips
-      jwt.verify.mockReturnValue({ userId: 'guest-001' });
+      mockJwtVerify.mockReturnValue({ userId: 'guest-001' } as any);
       testDb.query.mockResolvedValueOnce({ rows: [mockGuest] });
       testDb.query.mockResolvedValueOnce({ rows: [mockBooking] });
 
@@ -1762,7 +1773,7 @@ describe('Integration Tests', () => {
         is_read: false
       };
 
-      jwt.verify.mockReturnValue({ userId: 'user-001' });
+      mockJwtVerify.mockReturnValue({ userId: 'user-001' } as any);
       testDb.query.mockResolvedValueOnce({ rows: [mockUser1] });
       testDb.query.mockResolvedValueOnce({ rows: [mockUser2] });
       testDb.query.mockResolvedValueOnce({ rows: [mockMessage] });
@@ -1776,7 +1787,7 @@ describe('Integration Tests', () => {
       expect(sendResponse.body.content).toBe(messageData.content);
 
       // 2. User 2 retrieves messages
-      jwt.verify.mockReturnValue({ userId: 'user-002' });
+      mockJwtVerify.mockReturnValue({ userId: 'user-002' } as any);
       testDb.query.mockResolvedValueOnce({ rows: [mockUser2] });
       testDb.query.mockResolvedValueOnce({ rows: [mockMessage] });
 
@@ -1856,7 +1867,7 @@ describe('Integration Tests', () => {
         is_visible: false
       };
 
-      jwt.verify.mockReturnValue({ userId: 'guest-001' });
+      mockJwtVerify.mockReturnValue({ userId: 'guest-001' } as any);
       testDb.query.mockResolvedValueOnce({ rows: [mockGuest] });
       testDb.query.mockResolvedValueOnce({ rows: [mockBooking] });
       testDb.query.mockResolvedValueOnce({ rows: [] });
@@ -1885,7 +1896,7 @@ describe('Integration Tests', () => {
         is_visible: false
       };
 
-      jwt.verify.mockReturnValue({ userId: 'host-001' });
+      mockJwtVerify.mockReturnValue({ userId: 'host-001' } as any);
       testDb.query.mockResolvedValueOnce({ rows: [mockHost] });
       testDb.query.mockResolvedValueOnce({ rows: [mockBooking] });
       testDb.query.mockResolvedValueOnce({ rows: [] });

@@ -1,14 +1,28 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
 import { fileURLToPath } from 'url';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import morgan from 'morgan';
-import { Pool } from 'pg';
+import { Pool, PoolConfig } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
+
+// Extend Express Request type to include user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
+}
+
+// JWT payload interface
+interface JWTPayload extends JwtPayload {
+  user_id: string;
+}
 
 // Import Zod schemas
 import {
@@ -40,26 +54,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
 
 // Database configuration
 const { DATABASE_URL, PGHOST, PGDATABASE, PGUSER, PGPASSWORD, PGPORT = 5432, JWT_SECRET = 'your-secret-key' } = process.env;
 
-const pool = new Pool(
-  DATABASE_URL
-    ? { 
-        connectionString: DATABASE_URL, 
-        ssl: { require: true } 
-      }
-    : {
-        host: PGHOST,
-        database: PGDATABASE,
-        user: PGUSER,
-        password: PGPASSWORD,
-        port: Number(PGPORT),
-        ssl: { require: true },
-      }
-);
+const poolConfig: PoolConfig = DATABASE_URL
+  ? { 
+      connectionString: DATABASE_URL, 
+      ssl: { rejectUnauthorized: false } 
+    }
+  : {
+      host: PGHOST,
+      database: PGDATABASE,
+      user: PGUSER,
+      password: PGPASSWORD,
+      port: Number(PGPORT),
+      ssl: { rejectUnauthorized: false },
+    };
+
+const pool = new Pool(poolConfig);
 
 // Middleware
 app.use(cors({
@@ -127,7 +141,7 @@ function createErrorResponse(
 }
 
 // Authentication middleware
-const authenticateToken = async (req, res, next) => {
+const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -136,7 +150,7 @@ const authenticateToken = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
     const client = await pool.connect();
     const result = await client.query('SELECT * FROM users WHERE id = $1', [decoded.user_id]);
     client.release();
@@ -1264,13 +1278,13 @@ app.get('/api/villas/:villa_id/availability', async (req, res) => {
 
     if (date_from) {
       query += ` AND date >= $${paramCount}`;
-      params.push(date_from);
+      params.push(String(date_from));
       paramCount++;
     }
 
     if (date_to) {
       query += ` AND date <= $${paramCount}`;
-      params.push(date_to);
+      params.push(String(date_to));
       paramCount++;
     }
 
@@ -1444,7 +1458,7 @@ app.post('/api/bookings', authenticateToken, async (req, res) => {
     // Check availability for the date range
     const checkInDate = new Date(validatedData.check_in_date);
     const checkOutDate = new Date(validatedData.check_out_date);
-    const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+    const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
 
     if (nights < villa.minimum_nights) {
       client.release();
@@ -1989,9 +2003,9 @@ app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-export { app, pool };
-
 // Start the server
-app.listen(port, '0.0.0.0', () => {
+const server = app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port} and listening on 0.0.0.0`);
 });
+
+export { app, server, pool };
