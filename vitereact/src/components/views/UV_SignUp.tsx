@@ -106,6 +106,27 @@ const UV_SignUp: React.FC = () => {
       // Move to OTP step
       setIsOtpStep(true);
       setResendCountdown(30);
+      // Set default OTP for development environment
+      setOtpCode('123456');
+      
+      // For development environment, auto-verify after a short delay
+      if (import.meta.env.MODE === 'development') {
+        setTimeout(async () => {
+          try {
+            await verifyPhone(signUpForm.phone_number, '123456');
+            // Navigate to appropriate dashboard based on account type
+            if (signUpForm.account_type === 'host') {
+              navigate('/host/dashboard');
+            } else {
+              navigate('/');
+            }
+          } catch (error) {
+            console.error('Auto OTP verification failed:', error);
+            // If auto-verification fails, user can still manually verify
+            setLocalError('Auto-verification failed. Please enter 123456 to verify.');
+          }
+        }, 2000);
+      }
     } catch (error) {
       // Error is handled in store
       console.error('Registration failed:', error);
@@ -149,9 +170,14 @@ const UV_SignUp: React.FC = () => {
       // Note: Resend endpoint is missing in OpenAPI spec
       // This is a placeholder implementation
       console.log('Resending OTP to:', signUpForm.phone_number);
+      // In development, show the test code again
+      if (import.meta.env.MODE === 'development') {
+        setOtpCode('123456');
+      }
       // In production, this would call the resend OTP endpoint
     } catch (error) {
       console.error('Resend OTP failed:', error);
+      setLocalError('Failed to resend OTP. Please try again.');
     }
   };
 
@@ -379,6 +405,15 @@ const UV_SignUp: React.FC = () => {
                 <p className="text-gray-600">
                   We've sent a 6-digit code to {signUpForm.phone_number}
                 </p>
+                {import.meta.env.MODE === 'development' ? (
+                  <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                    <strong>Development Mode:</strong> Auto-verifying with code 123456...
+                  </div>
+                ) : (
+                  <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+                    <strong>For Testing:</strong> Use code <code className="bg-blue-100 px-1 rounded">123456</code> to verify your phone
+                  </div>
+                )}
               </div>
 
               {displayError && (
