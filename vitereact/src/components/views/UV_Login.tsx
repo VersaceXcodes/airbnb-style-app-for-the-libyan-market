@@ -71,8 +71,10 @@ const UV_Login: React.FC = () => {
     try {
       await loginUser(loginForm.identifier, loginForm.password);
       
-      // On successful login, redirect to home
-      navigate('/');
+      // Wait for state to propagate before navigating
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
     } catch (error) {
       // Error is handled in the store
       console.error('Login error:', error);
