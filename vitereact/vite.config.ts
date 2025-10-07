@@ -35,7 +35,7 @@ export default defineConfig({
 	],
 	server: {
 		host: true,
-		allowedHosts: true,
+		allowedHosts: ['123airbnb-style-app-for-the-libyan-market.launchpulse.ai'],
 	},
 	resolve: {
 		alias: {
