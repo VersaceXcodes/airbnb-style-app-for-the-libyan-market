@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/main';
 
 const UV_SignUp: React.FC = () => {
   // URL params for pre-selecting account type
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const preselectedAccountType = searchParams.get('account_type') as 'guest' | 'host' | null;
 
   // Local state for form
@@ -124,7 +125,12 @@ const UV_SignUp: React.FC = () => {
 
     try {
       await verifyPhone(signUpForm.phone_number, otpCode);
-      // Success will be handled by store and redirect
+      // Navigate to appropriate dashboard based on account type
+      if (signUpForm.account_type === 'host') {
+        navigate('/host/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       // Error is handled in store
       console.error('OTP verification failed:', error);

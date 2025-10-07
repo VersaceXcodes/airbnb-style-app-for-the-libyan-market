@@ -228,19 +228,20 @@ export const useAppStore = create<AppState>()(
 
           const { user, token } = response.data;
 
+          // Store user and token but don't set as fully authenticated until phone is verified
           set(() => ({
             authentication_state: {
               current_user: user,
               auth_token: token,
               authentication_status: {
-                is_authenticated: true,
+                is_authenticated: false, // Will be set to true after OTP verification
                 is_loading: false,
               },
               error_message: null,
             },
           }));
 
-          get().initialize_socket();
+          // Don't initialize socket until phone is verified
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
           
@@ -267,7 +268,7 @@ export const useAppStore = create<AppState>()(
             { headers: { 'Content-Type': 'application/json' } }
           );
 
-          // Update user verification status
+          // Update user verification status and set as fully authenticated
           const { current_user } = get().authentication_state;
           if (current_user) {
             set(() => ({
@@ -277,8 +278,15 @@ export const useAppStore = create<AppState>()(
                   ...current_user,
                   is_phone_verified: true,
                 },
+                authentication_status: {
+                  is_authenticated: true, // Now fully authenticated
+                  is_loading: false,
+                },
               },
             }));
+            
+            // Initialize socket connection after successful verification
+            get().initialize_socket();
           }
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || error.message || 'OTP verification failed';
