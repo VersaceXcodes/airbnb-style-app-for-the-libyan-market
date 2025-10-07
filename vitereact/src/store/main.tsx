@@ -169,7 +169,7 @@ export const useAppStore = create<AppState>()(
               error_message: null,
             },
           }));
-
+          
           // Initialize socket after successful login
           get().initialize_socket();
         } catch (error: any) {

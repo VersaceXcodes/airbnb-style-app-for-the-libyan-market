@@ -84,6 +84,23 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
+// --- Authentication Guard for Login/Signup pages ---
+const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const isAuthenticated = useAppStore(state => state.authentication_state.authentication_status.is_authenticated);
+  const isLoading = useAppStore(state => state.authentication_state.authentication_status.is_loading);
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  // If user is already authenticated, redirect to dashboard/homepage
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 // --- Root App Component ---
 const App: React.FC = () => {
   const isLoading = useAppStore(state => state.authentication_state.authentication_status.is_loading);
@@ -108,9 +125,9 @@ const App: React.FC = () => {
           <Route path="/profile/:host_id" element={<PublicLayout><UV_HostPublicProfile /></PublicLayout>} />
           
           {/* Authentication Routes with Minimalist Layout */}
-          <Route path="/login" element={<AuthLayout><UV_Login /></AuthLayout>} />
-          <Route path="/signup" element={<AuthLayout><UV_SignUp /></AuthLayout>} />
-          <Route path="/reset-password" element={<AuthLayout><UV_PasswordReset /></AuthLayout>} />
+          <Route path="/login" element={<AuthGuard><AuthLayout><UV_Login /></AuthLayout></AuthGuard>} />
+          <Route path="/signup" element={<AuthGuard><AuthLayout><UV_SignUp /></AuthLayout></AuthGuard>} />
+          <Route path="/reset-password" element={<AuthGuard><AuthLayout><UV_PasswordReset /></AuthLayout></AuthGuard>} />
           
           {/* Protected Routes */}
           <Route 

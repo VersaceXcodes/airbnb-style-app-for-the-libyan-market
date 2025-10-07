@@ -21,9 +21,17 @@ const UV_Login: React.FC = () => {
 
   // Global state - CRITICAL: Individual selectors only
   const isLoading = useAppStore(state => state.authentication_state.authentication_status.is_loading);
+  const isAuthenticated = useAppStore(state => state.authentication_state.authentication_status.is_authenticated);
   const errorMessage = useAppStore(state => state.authentication_state.error_message);
   const loginUser = useAppStore(state => state.login_user);
   const clearAuthError = useAppStore(state => state.clear_auth_error);
+
+  // Handle authentication state changes
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate]);
 
   // Clear errors when component unmounts or inputs change
   useEffect(() => {
@@ -70,11 +78,8 @@ const UV_Login: React.FC = () => {
 
     try {
       await loginUser(loginForm.identifier, loginForm.password);
-      
-      // Wait for state to propagate before navigating
-      setTimeout(() => {
-        navigate('/', { replace: true });
-      }, 100);
+      // Navigation will be handled by the App component's authentication state change
+      // No manual navigation needed here
     } catch (error) {
       // Error is handled in the store
       console.error('Login error:', error);
