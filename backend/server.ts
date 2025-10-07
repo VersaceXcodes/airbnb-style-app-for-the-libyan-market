@@ -77,8 +77,14 @@ const pool = new Pool(poolConfig);
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [
+    process.env.FRONTEND_URL || 'http://localhost:5173',
+    process.env.ALLOWED_ORIGINS || '',
+    'https://123airbnb-style-app-for-the-libyan-market.launchpulse.ai'
+  ].filter(Boolean),
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
 }));
 app.use(express.json({ limit: "5mb" }));
 app.use(morgan('combined'));
@@ -174,6 +180,7 @@ const authenticateToken = async (req: Request, res: Response, next: NextFunction
 // POST /api/auth/register - Register a new user with phone verification
 app.post('/api/auth/register', async (req, res) => {
   try {
+    console.log('Registration request received:', req.body);
     const validatedData = createUserInputSchema.parse(req.body);
     
     const client = await pool.connect();
@@ -221,6 +228,8 @@ app.post('/api/auth/register', async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    console.log('User registered successfully:', user.id);
+    
     res.status(201).json({
       user: {
         id: user.id,
@@ -315,16 +324,20 @@ async function sendOTPSMS(phone_number, otp) {
 // POST /api/auth/verify-otp - Verify phone number with OTP
 app.post('/api/auth/verify-otp', async (req, res) => {
   try {
+    console.log('OTP verification request received:', req.body);
     const { phone_number, otp } = req.body;
 
     if (!phone_number || !otp) {
+      console.log('Missing phone number or OTP');
       return res.status(400).json(createErrorResponse('Phone number and OTP are required', null, 'MISSING_OTP_DATA'));
     }
 
     // Mock OTP verification - in production, verify against stored OTP
     const isValidOTP = otp === '123456'; // Mock valid OTP
+    console.log('OTP validation result:', isValidOTP);
 
     if (!isValidOTP) {
+      console.log('Invalid OTP provided:', otp);
       return res.status(400).json(createErrorResponse('Invalid OTP', null, 'INVALID_OTP'));
     }
 
@@ -339,9 +352,11 @@ app.post('/api/auth/verify-otp', async (req, res) => {
     client.release();
 
     if (result.rows.length === 0) {
+      console.log('User not found for phone number:', phone_number);
       return res.status(404).json(createErrorResponse('User not found', null, 'USER_NOT_FOUND'));
     }
 
+    console.log('Phone verification successful for user:', result.rows[0].id);
     res.json({ success: true });
   } catch (error) {
     console.error('OTP verification error:', error);

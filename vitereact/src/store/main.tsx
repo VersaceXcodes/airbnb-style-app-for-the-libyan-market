@@ -150,8 +150,9 @@ export const useAppStore = create<AppState>()(
         }));
         
         try {
+          const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
           const response = await axios.post(
-            `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/auth/login`,
+            `${apiBaseUrl}/api/auth/login`,
             { identifier, password },
             { headers: { 'Content-Type': 'application/json' } }
           );
@@ -220,12 +221,17 @@ export const useAppStore = create<AppState>()(
         }));
         
         try {
+          const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+          console.log('Registering user with API URL:', apiBaseUrl);
+          console.log('Registration data:', user_data);
+          
           const response = await axios.post(
-            `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/auth/register`,
+            `${apiBaseUrl}/api/auth/register`,
             user_data,
             { headers: { 'Content-Type': 'application/json' } }
           );
 
+          console.log('Registration response:', response.data);
           const { user, token } = response.data;
 
           // Store user and token but don't set as fully authenticated until phone is verified
@@ -241,9 +247,23 @@ export const useAppStore = create<AppState>()(
             },
           }));
 
+          console.log('User registered successfully, awaiting OTP verification');
           // Don't initialize socket until phone is verified
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+          console.error('Registration error:', error);
+          let errorMessage = 'Registration failed';
+          
+          if (error.response?.status === 502) {
+            errorMessage = 'Server is temporarily unavailable. Please try again later.';
+          } else if (error.response?.status === 409) {
+            errorMessage = 'User already exists with this phone number or email.';
+          } else if (error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          } else if (error.code === 'NETWORK_ERROR' || !error.response) {
+            errorMessage = 'Network error. Please check your connection and try again.';
+          } else {
+            errorMessage = error.message || 'Registration failed';
+          }
           
           set(() => ({
             authentication_state: {
@@ -262,11 +282,17 @@ export const useAppStore = create<AppState>()(
       
       verify_phone: async (phone_number: string, otp: string) => {
         try {
+          const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+          console.log('Verifying OTP with API URL:', apiBaseUrl);
+          console.log('OTP verification data:', { phone_number, otp });
+          
           await axios.post(
-            `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/auth/verify-otp`,
+            `${apiBaseUrl}/api/auth/verify-otp`,
             { phone_number, otp },
             { headers: { 'Content-Type': 'application/json' } }
           );
+
+          console.log('OTP verification successful');
 
           // Update user verification status and set as fully authenticated
           const { current_user } = get().authentication_state;
@@ -285,11 +311,38 @@ export const useAppStore = create<AppState>()(
               },
             }));
             
+            console.log('User is now fully authenticated');
             // Initialize socket connection after successful verification
             get().initialize_socket();
           }
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || error.message || 'OTP verification failed';
+          console.error('OTP verification error:', error);
+          let errorMessage = 'OTP verification failed';
+          
+          if (error.response?.status === 502) {
+            errorMessage = 'Server is temporarily unavailable. Please try again later.';
+          } else if (error.response?.status === 400 && error.response?.data?.error_code === 'INVALID_OTP') {
+            errorMessage = 'Invalid OTP code. Please try again.';
+          } else if (error.response?.status === 404) {
+            errorMessage = 'User not found. Please register first.';
+          } else if (error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          } else if (error.code === 'NETWORK_ERROR' || !error.response) {
+            errorMessage = 'Network error. Please check your connection and try again.';
+          } else {
+            errorMessage = error.message || 'OTP verification failed';
+          }
+          
+          set(() => ({
+            authentication_state: {
+              ...get().authentication_state,
+              error_message: errorMessage,
+              authentication_status: {
+                is_authenticated: false,
+                is_loading: false,
+              },
+            },
+          }));
           throw new Error(errorMessage);
         }
       },
@@ -312,8 +365,9 @@ export const useAppStore = create<AppState>()(
         }
 
         try {
+          const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
           const response = await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/users/me`,
+            `${apiBaseUrl}/api/users/me`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
 
@@ -366,8 +420,9 @@ export const useAppStore = create<AppState>()(
         }
 
         try {
+          const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
           const response = await axios.patch(
-            `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/users/me`,
+            `${apiBaseUrl}/api/users/me`,
             user_data,
             { headers: { 
               'Content-Type': 'application/json',
@@ -453,8 +508,9 @@ export const useAppStore = create<AppState>()(
           return;
         }
 
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
         const socket = io(
-          import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+          apiBaseUrl,
           {
             auth: {
               token: auth_token,

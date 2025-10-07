@@ -95,6 +95,13 @@ const UV_SignUp: React.FC = () => {
     }
 
     try {
+      console.log('Starting user registration...', {
+        name: signUpForm.name,
+        email: signUpForm.email || null,
+        phone_number: signUpForm.phone_number,
+        account_type: signUpForm.account_type
+      });
+      
       await registerUser({
         name: signUpForm.name,
         email: signUpForm.email || null,
@@ -103,6 +110,8 @@ const UV_SignUp: React.FC = () => {
         account_type: signUpForm.account_type
       });
 
+      console.log('Registration successful, moving to OTP step...');
+
       // Move to OTP step
       setIsOtpStep(true);
       setResendCountdown(30);
@@ -110,10 +119,17 @@ const UV_SignUp: React.FC = () => {
       setOtpCode('123456');
       
       // For development environment, auto-verify after a short delay
-      if (import.meta.env.MODE === 'development') {
+      const isDevelopment = import.meta.env.MODE === 'development' || 
+                           import.meta.env.VITE_NODE_ENV === 'development' ||
+                           window.location.hostname === 'localhost' ||
+                           import.meta.env.DEV;
+      
+      if (isDevelopment) {
+        console.log('Development mode detected, auto-verifying in 3 seconds...');
         setTimeout(async () => {
           try {
             await verifyPhone(signUpForm.phone_number, '123456');
+            console.log('Auto-verification successful, navigating...');
             // Navigate to appropriate dashboard based on account type
             if (signUpForm.account_type === 'host') {
               navigate('/host/dashboard');
@@ -125,11 +141,19 @@ const UV_SignUp: React.FC = () => {
             // If auto-verification fails, user can still manually verify
             setLocalError('Auto-verification failed. Please enter 123456 to verify.');
           }
-        }, 2000);
+        }, 3000);
+      } else {
+        // For production, just show the OTP step and let user manually verify
+        console.log('Production mode detected, awaiting manual OTP verification');
       }
-    } catch (error) {
+    } catch (error: any) {
       // Error is handled in store
       console.error('Registration failed:', error);
+      
+      // If it's a 502 error, show a more helpful message
+      if (error.message.includes('temporarily unavailable')) {
+        setLocalError('Registration server is temporarily unavailable. Please try again in a few moments.');
+      }
     }
   };
 
@@ -152,9 +176,14 @@ const UV_SignUp: React.FC = () => {
       } else {
         navigate('/');
       }
-    } catch (error) {
+    } catch (error: any) {
       // Error is handled in store
       console.error('OTP verification failed:', error);
+      
+      // If it's a 502 error, show a more helpful message
+      if (error.message.includes('temporarily unavailable')) {
+        setLocalError('Verification server is temporarily unavailable. Please try again in a few moments.');
+      }
     }
   };
 
@@ -171,7 +200,12 @@ const UV_SignUp: React.FC = () => {
       // This is a placeholder implementation
       console.log('Resending OTP to:', signUpForm.phone_number);
       // In development, show the test code again
-      if (import.meta.env.MODE === 'development') {
+      const isDevelopment = import.meta.env.MODE === 'development' || 
+                           import.meta.env.VITE_NODE_ENV === 'development' ||
+                           window.location.hostname === 'localhost' ||
+                           import.meta.env.DEV;
+                           
+      if (isDevelopment) {
         setOtpCode('123456');
       }
       // In production, this would call the resend OTP endpoint
@@ -405,15 +439,21 @@ const UV_SignUp: React.FC = () => {
                 <p className="text-gray-600">
                   We've sent a 6-digit code to {signUpForm.phone_number}
                 </p>
-                {import.meta.env.MODE === 'development' ? (
-                  <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                    <strong>Development Mode:</strong> Auto-verifying with code 123456...
-                  </div>
-                ) : (
-                  <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
-                    <strong>For Testing:</strong> Use code <code className="bg-blue-100 px-1 rounded">123456</code> to verify your phone
-                  </div>
-                )}
+                {(() => {
+                  const isDevelopment = import.meta.env.MODE === 'development' || 
+                                       import.meta.env.VITE_NODE_ENV === 'development' ||
+                                       window.location.hostname === 'localhost' ||
+                                       import.meta.env.DEV;
+                  return isDevelopment ? (
+                    <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                      <strong>Development Mode:</strong> Auto-verifying with code 123456 in 3 seconds...
+                    </div>
+                  ) : (
+                    <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+                      <strong>For Testing:</strong> Use code <code className="bg-blue-100 px-1 rounded">123456</code> to verify your phone
+                    </div>
+                  );
+                })()}
               </div>
 
               {displayError && (
