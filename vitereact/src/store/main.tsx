@@ -508,50 +508,61 @@ export const useAppStore = create<AppState>()(
           return;
         }
 
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
-        const socket = io(
-          apiBaseUrl,
-          {
-            auth: {
-              token: auth_token,
-            },
-          }
-        );
+        try {
+          const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+          const socket = io(
+            apiBaseUrl,
+            {
+              auth: {
+                token: auth_token,
+              },
+              reconnection: true,
+              reconnectionAttempts: 3,
+              reconnectionDelay: 1000,
+              timeout: 5000,
+            }
+          );
 
-        socket.on('connect', () => {
+          socket.on('connect', () => {
+            set(() => ({
+              realtime_state: {
+                ...get().realtime_state,
+                is_connected: true,
+              },
+            }));
+          });
+
+          socket.on('connect_error', () => {
+            // Socket.IO is not yet implemented on backend - suppress warnings
+          });
+
+          socket.on('disconnect', () => {
+            set(() => ({
+              realtime_state: {
+                ...get().realtime_state,
+                is_connected: false,
+              },
+            }));
+          });
+
+          socket.on('message_received', () => {
+            const { unread_count } = get().notification_state;
+            get().update_unread_count(unread_count + 1);
+          });
+
+          socket.on('booking_status_updated', () => {
+            // Handle booking updates - could refresh queries here
+          });
+
           set(() => ({
             realtime_state: {
-              ...get().realtime_state,
-              is_connected: true,
+              socket,
+              is_connected: socket.connected,
             },
           }));
-        });
-
-        socket.on('disconnect', () => {
-          set(() => ({
-            realtime_state: {
-              ...get().realtime_state,
-              is_connected: false,
-            },
-          }));
-        });
-
-        socket.on('message_received', () => {
-          // Update unread count
-          const { unread_count } = get().notification_state;
-          get().update_unread_count(unread_count + 1);
-        });
-
-        socket.on('booking_status_updated', () => {
-          // Handle booking updates - could refresh queries here
-        });
-
-        set(() => ({
-          realtime_state: {
-            socket,
-            is_connected: socket.connected,
-          },
-        }));
+        } catch {
+          // Socket.IO is not yet implemented - silently fail
+        }
       },
       
       disconnect_socket: () => {

@@ -53,12 +53,18 @@ const UV_Homepage: React.FC = () => {
   });
 
   const fetchFeaturedListings = async () => {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
-    const response = await fetch(`${apiBaseUrl}/api/villas?limit=6`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch listings');
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+      const response = await fetch(`${apiBaseUrl}/api/villas?limit=6`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch listings: ${response.status}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching featured listings:', error);
+      throw error;
     }
-    return response.json();
   };
 
   const { data: featuredListings = [], isLoading: isLoadingListings, error: listingsError } = useQuery({
