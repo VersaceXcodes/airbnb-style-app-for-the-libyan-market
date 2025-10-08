@@ -9,7 +9,10 @@ import UV_Login from '@/components/views/UV_Login';
 import { useAppStore } from '@/store/main';
 
 const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <BrowserRouter>{children}</BrowserRouter>
+  <BrowserRouter future={{
+    v7_startTransition: true,
+    v7_relativeSplatPath: true
+  }}>{children}</BrowserRouter>
 );
 
 describe('Auth E2E Flow (Real API)', () => {

@@ -116,7 +116,10 @@ const App: React.FC = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
+      <Router future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true
+      }}>
         <Routes>
           {/* Public Routes with Standard Layout */}
           <Route path="/" element={<PublicLayout><UV_Homepage /></PublicLayout>} />
