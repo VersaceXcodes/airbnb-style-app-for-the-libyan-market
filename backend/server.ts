@@ -73,21 +73,52 @@ const poolConfig: PoolConfig = DATABASE_URL
       ssl: { rejectUnauthorized: false },
     };
 
+// Initialize database pool with error handling
 const pool = new Pool(poolConfig);
 
-// Middleware
+// Test database connection on startup
+pool.connect()
+  .then((client) => {
+    console.log('✅ Database connected successfully');
+    client.release();
+  })
+  .catch((error) => {
+    console.error('❌ Database connection failed:', error.message);
+    console.error('Full error:', error);
+    process.exit(1);
+  });
+
+// Handle pool errors
+pool.on('error', (err) => {
+  console.error('❌ Unexpected database error:', err);
+});
+
+// Enhanced middleware setup with better CORS and error handling
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:5173',
-    process.env.ALLOWED_ORIGINS || '',
-    'https://123airbnb-style-app-for-the-libyan-market.launchpulse.ai'
+    process.env.ALLOWED_ORIGINS,
+    'https://123airbnb-style-app-for-the-libyan-market.launchpulse.ai',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
   ].filter(Boolean),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+  exposedHeaders: ['X-Total-Count'],
 }));
+
 app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'));
+
+// Security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -2005,22 +2036,134 @@ app.patch('/api/reviews/:review_id', authenticateToken, async (req, res) => {
   }
 });
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+// Enhanced health check endpoint
+app.get('/api/health', async (req, res) => {
+  try {
+    // Test database connection
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
+    
+    res.json({ 
+      status: 'ok', 
+      timestamp: new Date().toISOString(),
+      database: 'connected',
+      environment: process.env.NODE_ENV || 'development',
+      port: port,
+      frontend_served: fs.existsSync(path.join(__dirname, 'public', 'index.html'))
+    });
+  } catch (error) {
+    console.error('Health check failed:', error);
+    res.status(503).json(createErrorResponse(
+      'Service unhealthy',
+      error,
+      'HEALTH_CHECK_FAILED'
+    ));
+  }
 });
 
 // Serve static files from storage
 app.use('/api/storage', express.static(storageDir));
 
-// SPA catch-all: serve index.html for non-API routes only
-app.get(/^(?!\/api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Global error handler
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('Global error handler:', error);
+  
+  if (res.headersSent) {
+    return next(error);
+  }
+  
+  res.status(error.status || 500).json(
+    createErrorResponse(
+      error.message || 'Internal server error', 
+      error, 
+      error.code || 'INTERNAL_ERROR'
+    )
+  );
 });
 
-// Start the server
+// Handle 404 for API routes specifically
+app.use('/api/*', (req, res) => {
+  res.status(404).json(createErrorResponse(
+    `API endpoint not found: ${req.path}`,
+    null,
+    'ENDPOINT_NOT_FOUND'
+  ));
+});
+
+// SPA catch-all: serve index.html for all non-API routes
+app.get('*', (req, res) => {
+  // Don't serve SPA for API routes that weren't caught above
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json(createErrorResponse(
+      `API endpoint not found: ${req.path}`,
+      null,
+      'ENDPOINT_NOT_FOUND'
+    ));
+  }
+  
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  
+  // Check if index.html exists
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    console.error('index.html not found at:', indexPath);
+    res.status(500).json(createErrorResponse(
+      'Frontend application not available',
+      null,
+      'FRONTEND_NOT_AVAILABLE'
+    ));
+  }
+});
+
+// Start the server with enhanced logging
 const server = app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on port ${port} and listening on 0.0.0.0`);
+  console.log('🚀 Server started successfully');
+  console.log(`📡 Server running on http://0.0.0.0:${port}`);
+  console.log(`🌍 External URL: ${process.env.FRONTEND_URL || `http://localhost:${port}`}`);
+  console.log(`📁 Serving static files from: ${path.join(__dirname, 'public')}`);
+  console.log(`💾 Database: ${poolConfig.connectionString ? 'Remote PostgreSQL' : 'Local PostgreSQL'}`);
+  console.log('✅ Application ready to accept connections');
+  
+  // Log available API endpoints
+  console.log('\n📚 Available API Endpoints:');
+  console.log('  GET  /api/health - Health check');
+  console.log('  POST /api/auth/register - User registration');
+  console.log('  POST /api/auth/login - User login');
+  console.log('  GET  /api/villas - List villas');
+  console.log('  GET  /api/users/me - Get current user profile');
+  console.log('  ... and more\n');
+});
+
+// Handle server errors
+server.on('error', (error: any) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${port} is already in use`);
+    process.exit(1);
+  } else {
+    console.error('❌ Server error:', error);
+    process.exit(1);
+  }
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('✅ Process terminated');
+    pool.end();
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('🛑 SIGINT received, shutting down gracefully');
+  server.close(() => {
+    console.log('✅ Process terminated');
+    pool.end();
+    process.exit(0);
+  });
 });
 
 export { app, server, pool };
