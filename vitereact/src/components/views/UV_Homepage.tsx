@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAppStore } from '@/store/main';
-import { Search, MapPin, Calendar, Users, Globe, Home, ChevronDown, Star, Quote, TrendingUp, Shield, Award } from 'lucide-react';
+import { Search, MapPin, Calendar, Users, Globe, Home, ChevronDown, Star, Quote, Shield, Award } from 'lucide-react';
 
 const UV_Homepage: React.FC = () => {
   // Individual Zustand selectors - CRITICAL: no object destructuring
