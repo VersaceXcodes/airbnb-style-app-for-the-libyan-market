@@ -10,8 +10,8 @@
     "identifier_fields": ["email", "phone_number"],
     "password_field": "password_hash"
   },
-  "total_users": 8,
-  "verified_users": 8,
+  "total_users": 9,
+  "verified_users": 9,
   "notes": [
     "All users are seeded from backend/db.sql",
     "Passwords are stored in plain text for development (password_hash field)",
@@ -114,6 +114,18 @@
       "profile_picture_url": "https://picsum.photos/seed/user008/200/200.jpg",
       "verified": true,
       "description": "Host with countryside farmhouse"
+    },
+    {
+      "id": "user_009",
+      "name": "Test User",
+      "email": "versacecodes@gmail.com",
+      "phone_number": "+1234567898",
+      "password": "Airplanes@99",
+      "account_type": "guest",
+      "is_phone_verified": true,
+      "profile_picture_url": "https://picsum.photos/seed/user009/200/200.jpg",
+      "verified": true,
+      "description": "Test user for browser automation"
     }
   ],
   "by_role": {
@@ -183,6 +195,14 @@
         "password": "user123",
         "verified": true,
         "description": "Guest with confirmed bookings"
+      },
+      {
+        "id": "user_009",
+        "email": "versacecodes@gmail.com",
+        "phone_number": "+1234567898",
+        "password": "Airplanes@99",
+        "verified": true,
+        "description": "Test user for browser automation"
       }
     ]
   },
