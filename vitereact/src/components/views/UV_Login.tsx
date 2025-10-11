@@ -30,7 +30,11 @@ const UV_Login: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
       console.log('User authenticated, navigating to home');
-      navigate('/', { replace: true });
+      // Add a small delay to prevent form disconnection issues
+      const timer = setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [isAuthenticated, isLoading, navigate]);
 
@@ -67,6 +71,12 @@ const UV_Login: React.FC = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Ensure form is still connected
+    if (!e.target || !(e.target as HTMLFormElement).isConnected) {
+      console.warn('Form is disconnected, skipping submission');
+      return;
+    }
     
     // Clear previous errors
     clearAuthError();
