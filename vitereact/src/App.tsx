@@ -99,6 +99,7 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   // If user is already authenticated, redirect to dashboard/homepage
   if (isAuthenticated) {
+    console.log('AuthGuard: User is authenticated, redirecting to home');
     return <Navigate to="/" replace />;
   }
 
@@ -108,11 +109,15 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 // --- Root App Component ---
 const App: React.FC = () => {
   const isLoading = useAppStore(state => state.authentication_state.authentication_status.is_loading);
+  const isAuthenticated = useAppStore(state => state.authentication_state.authentication_status.is_authenticated);
   const initializeAuth = useAppStore(state => state.initialize_auth);
 
   useEffect(() => {
+    console.log('App: Initializing authentication...');
     initializeAuth();
   }, [initializeAuth]);
+
+  console.log('App render - loading:', isLoading, 'authenticated:', isAuthenticated);
 
   if (isLoading) {
     return <LoadingSpinner />;

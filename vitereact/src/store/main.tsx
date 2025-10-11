@@ -138,6 +138,7 @@ export const useAppStore = create<AppState>()(
       
       // Auth Actions
       login_user: async (identifier: string, password: string) => {
+        console.log('Starting login process...', { identifier, password: '[REDACTED]' });
         set(() => ({
           authentication_state: {
             ...get().authentication_state,
@@ -151,12 +152,14 @@ export const useAppStore = create<AppState>()(
         
         try {
           const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+          console.log('Making login request to:', `${apiBaseUrl}/api/auth/login`);
           const response = await axios.post(
             `${apiBaseUrl}/api/auth/login`,
             { identifier, password },
             { headers: { 'Content-Type': 'application/json' } }
           );
 
+          console.log('Login response received:', response.status, response.data);
           const { user, token } = response.data;
 
           set(() => ({
@@ -171,10 +174,24 @@ export const useAppStore = create<AppState>()(
             },
           }));
           
+          console.log('Login successful, user authenticated:', user.id);
           // Initialize socket after successful login
           get().initialize_socket();
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+          console.error('Login error details:', error);
+          let errorMessage = 'Login failed';
+          
+          if (error.response?.status === 502) {
+            errorMessage = 'Server is temporarily unavailable. Please try again later.';
+          } else if (error.response?.status === 401) {
+            errorMessage = 'Invalid credentials. Please check your email/phone and password.';
+          } else if (error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          } else if (error.code === 'NETWORK_ERROR' || !error.response) {
+            errorMessage = 'Network error. Please check your connection and try again.';
+          } else {
+            errorMessage = error.message || 'Login failed';
+          }
           
           set(() => ({
             authentication_state: {
@@ -348,10 +365,13 @@ export const useAppStore = create<AppState>()(
       },
       
       initialize_auth: async () => {
+        console.log('Initializing auth...');
         const { authentication_state } = get();
         const token = authentication_state.auth_token;
+        console.log('Stored token:', token ? 'exists' : 'none');
         
         if (!token) {
+          console.log('No token found, setting not authenticated');
           set(() => ({
             authentication_state: {
               ...get().authentication_state,
@@ -365,6 +385,7 @@ export const useAppStore = create<AppState>()(
         }
 
         try {
+          console.log('Verifying token...');
           const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
           const response = await axios.get(
             `${apiBaseUrl}/api/users/me`,
@@ -372,6 +393,7 @@ export const useAppStore = create<AppState>()(
           );
 
           const user = response.data;
+          console.log('Token valid, user authenticated:', user.id);
           
           set(() => ({
             authentication_state: {
@@ -387,8 +409,9 @@ export const useAppStore = create<AppState>()(
 
           // Initialize socket after successful auth check
           get().initialize_socket();
-        } catch {
+        } catch (error) {
           // Token is invalid, clear auth state
+          console.log('Token invalid, clearing auth state:', error);
           set(() => ({
             authentication_state: {
               current_user: null,

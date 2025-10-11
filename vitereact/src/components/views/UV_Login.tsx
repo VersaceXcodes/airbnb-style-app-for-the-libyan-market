@@ -29,6 +29,7 @@ const UV_Login: React.FC = () => {
   // Handle authentication state changes
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
+      console.log('User authenticated, navigating to home');
       navigate('/', { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
@@ -77,9 +78,10 @@ const UV_Login: React.FC = () => {
     }
 
     try {
+      console.log('Attempting login with:', { identifier: loginForm.identifier, password: '[REDACTED]' });
       await loginUser(loginForm.identifier, loginForm.password);
-      // Navigation will be handled by the App component's authentication state change
-      // No manual navigation needed here
+      console.log('Login successful');
+      // Navigation will be handled by the useEffect when authentication state changes
     } catch (error) {
       // Error is handled in the store
       console.error('Login error:', error);
