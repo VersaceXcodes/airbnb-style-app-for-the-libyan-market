@@ -156,12 +156,21 @@ export const useAppStore = create<AppState>()(
           const response = await axios.post(
             `${apiBaseUrl}/api/auth/login`,
             { identifier, password },
-            { headers: { 'Content-Type': 'application/json' } }
+            { 
+              headers: { 'Content-Type': 'application/json' },
+              timeout: 10000 // 10 second timeout
+            }
           );
 
           console.log('Login response received:', response.status, response.data);
+          
+          if (!response.data || !response.data.user || !response.data.token) {
+            throw new Error('Invalid response from server - missing user or token');
+          }
+          
           const { user, token } = response.data;
 
+          // Update authentication state with proper persistence
           set(() => ({
             authentication_state: {
               current_user: user,
@@ -174,14 +183,22 @@ export const useAppStore = create<AppState>()(
             },
           }));
           
-          console.log('Login successful, user authenticated:', user.id);
+          console.log('Login successful, user authenticated:', user.id, 'token length:', token.length);
+          console.log('Auth state updated:', get().authentication_state.authentication_status.is_authenticated);
+          
           // Initialize socket after successful login
           get().initialize_socket();
+          
+          // Force a small delay to ensure state is persisted
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
         } catch (error: any) {
           console.error('Login error details:', error);
           let errorMessage = 'Login failed';
           
-          if (error.response?.status === 502) {
+          if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+            errorMessage = 'Request timed out. Please try again.';
+          } else if (error.response?.status === 502) {
             errorMessage = 'Server is temporarily unavailable. Please try again later.';
           } else if (error.response?.status === 401) {
             errorMessage = 'Invalid credentials. Please check your email/phone and password.';
@@ -368,36 +385,43 @@ export const useAppStore = create<AppState>()(
         console.log('Initializing auth...');
         const { authentication_state } = get();
         const token = authentication_state.auth_token;
-        console.log('Stored token:', token ? 'exists' : 'none');
+        const user = authentication_state.current_user;
+        console.log('Stored token:', token ? `exists (${token.slice(0, 10)}...)` : 'none');
+        console.log('Stored user:', user ? `exists (${user.id})` : 'none');
         
-        if (!token) {
-          console.log('No token found, setting not authenticated');
+        if (!token || !user) {
+          console.log('No token or user found, setting not authenticated');
           set(() => ({
             authentication_state: {
-              ...get().authentication_state,
+              current_user: null,
+              auth_token: null,
               authentication_status: {
-                ...get().authentication_state.authentication_status,
+                is_authenticated: false,
                 is_loading: false,
               },
+              error_message: null,
             },
           }));
           return;
         }
 
         try {
-          console.log('Verifying token...');
+          console.log('Verifying token with backend...');
           const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
           const response = await axios.get(
             `${apiBaseUrl}/api/users/me`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { 
+              headers: { Authorization: `Bearer ${token}` },
+              timeout: 5000 // 5 second timeout for auth check
+            }
           );
 
-          const user = response.data;
-          console.log('Token valid, user authenticated:', user.id);
+          const freshUser = response.data;
+          console.log('Token valid, user authenticated:', freshUser.id);
           
           set(() => ({
             authentication_state: {
-              current_user: user,
+              current_user: freshUser,
               auth_token: token,
               authentication_status: {
                 is_authenticated: true,
@@ -409,9 +433,9 @@ export const useAppStore = create<AppState>()(
 
           // Initialize socket after successful auth check
           get().initialize_socket();
-        } catch (error) {
+        } catch (error: any) {
           // Token is invalid, clear auth state
-          console.log('Token invalid, clearing auth state:', error);
+          console.log('Token validation failed, clearing auth state:', error.response?.status, error.message);
           set(() => ({
             authentication_state: {
               current_user: null,

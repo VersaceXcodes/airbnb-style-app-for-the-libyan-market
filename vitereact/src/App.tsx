@@ -93,6 +93,8 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isAuthenticated = useAppStore(state => state.authentication_state.authentication_status.is_authenticated);
   const isLoading = useAppStore(state => state.authentication_state.authentication_status.is_loading);
 
+  console.log('AuthGuard state:', { isAuthenticated, isLoading });
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -118,6 +120,17 @@ const App: React.FC = () => {
   }, [initializeAuth]);
 
   console.log('App render - loading:', isLoading, 'authenticated:', isAuthenticated);
+  
+  // Debug authentication state
+  React.useEffect(() => {
+    const state = useAppStore.getState().authentication_state;
+    console.log('Full auth state:', {
+      hasUser: !!state.current_user,
+      hasToken: !!state.auth_token,
+      isAuthenticated: state.authentication_status.is_authenticated,
+      isLoading: state.authentication_status.is_loading
+    });
+  }, [isLoading, isAuthenticated]);
 
   if (isLoading) {
     return <LoadingSpinner />;

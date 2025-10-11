@@ -28,13 +28,11 @@ const UV_Login: React.FC = () => {
 
   // Handle authentication state changes
   useEffect(() => {
+    console.log('Login component auth state changed:', { isAuthenticated, isLoading });
     if (isAuthenticated && !isLoading) {
       console.log('User authenticated, navigating to home');
-      // Add a small delay to prevent form disconnection issues
-      const timer = setTimeout(() => {
-        navigate('/', { replace: true });
-      }, 100);
-      return () => clearTimeout(timer);
+      // Navigate immediately but ensure component cleanup doesn't interfere
+      navigate('/', { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
 
@@ -90,7 +88,16 @@ const UV_Login: React.FC = () => {
     try {
       console.log('Attempting login with:', { identifier: loginForm.identifier, password: '[REDACTED]' });
       await loginUser(loginForm.identifier, loginForm.password);
-      console.log('Login successful');
+      console.log('Login request completed, checking auth state...');
+      
+      // After login success, check if we're authenticated
+      const currentState = useAppStore.getState();
+      console.log('Current auth state after login:', {
+        isAuthenticated: currentState.authentication_state.authentication_status.is_authenticated,
+        hasToken: !!currentState.authentication_state.auth_token,
+        hasUser: !!currentState.authentication_state.current_user
+      });
+      
       // Navigation will be handled by the useEffect when authentication state changes
     } catch (error) {
       // Error is handled in the store
