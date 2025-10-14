@@ -26,13 +26,13 @@ const UV_Login: React.FC = () => {
   const loginUser = useAppStore(state => state.login_user);
   const clearAuthError = useAppStore(state => state.clear_auth_error);
 
-  // Handle authentication state changes
+// Handle authentication state changes
   useEffect(() => {
     console.log('Login component auth state changed:', { isAuthenticated, isLoading });
     if (isAuthenticated && !isLoading) {
-      console.log('User authenticated, navigating to home');
-      // Navigate immediately but ensure component cleanup doesn't interfere
-      navigate('/', { replace: true });
+      console.log('User authenticated, navigating to profile');
+      // Navigate to user profile after successful login
+      navigate('/profile', { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
 
