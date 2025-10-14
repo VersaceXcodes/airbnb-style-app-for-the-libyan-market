@@ -32,7 +32,7 @@ const UV_Login: React.FC = () => {
     if (isAuthenticated && !isLoading) {
       console.log('User authenticated, navigating to profile');
       // Navigate to user profile after successful login
-      navigate('/profile', { replace: true });
+      navigate('/profile');
     }
   }, [isAuthenticated, isLoading, navigate]);
 

@@ -99,10 +99,10 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return <LoadingSpinner />;
   }
 
-  // If user is already authenticated, redirect to dashboard/homepage
+  // If user is already authenticated, redirect to profile (not home)
   if (isAuthenticated) {
-    console.log('AuthGuard: User is authenticated, redirecting to home');
-    return <Navigate to="/" replace />;
+    console.log('AuthGuard: User is authenticated, redirecting to profile');
+    return <Navigate to="/profile" replace />;
   }
 
   return <>{children}</>;

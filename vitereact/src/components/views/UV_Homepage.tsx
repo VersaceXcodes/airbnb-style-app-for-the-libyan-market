@@ -8,6 +8,8 @@ const UV_Homepage: React.FC = () => {
   // Individual Zustand selectors - CRITICAL: no object destructuring
   const preferredLanguage = useAppStore(state => state.ui_preferences.preferred_language);
   const setLanguage = useAppStore(state => state.set_language);
+  const isAuthenticated = useAppStore(state => state.authentication_state.authentication_status.is_authenticated);
+  const currentUser = useAppStore(state => state.authentication_state.current_user);
   
   const navigate = useNavigate();
   const [searchForm, setSearchForm] = useState({
@@ -220,18 +222,42 @@ const UV_Homepage: React.FC = () => {
               </Link>
               
               <div className="flex items-center space-x-4">
-                <Link
-                  to="/signup"
-                  className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
-                >
-                  {preferredLanguage === 'ar' ? 'إنشاء حساب' : 'Sign up'}
-                </Link>
-                <Link
-                  to="/login"
-                  className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
-                >
-                  {preferredLanguage === 'ar' ? 'تسجيل الدخول' : 'Log in'}
-                </Link>
+                {isAuthenticated && currentUser ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors flex items-center"
+                    >
+                      <img 
+                        src={currentUser.profile_picture_url || 'https://picsum.photos/seed/user009/200/200.jpg'} 
+                        alt={currentUser.name}
+                        className="h-6 w-6 rounded-full mr-2"
+                      />
+                      {currentUser.name}
+                    </Link>
+                    <Link
+                      to="/host/dashboard"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
+                    >
+                      {preferredLanguage === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/signup"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
+                    >
+                      {preferredLanguage === 'ar' ? 'إنشاء حساب' : 'Sign up'}
+                    </Link>
+                    <Link
+                      to="/login"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
+                    >
+                      {preferredLanguage === 'ar' ? 'تسجيل الدخول' : 'Log in'}
+                    </Link>
+                  </>
+                )}
                 <button
                   onClick={toggleLanguage}
                   className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
