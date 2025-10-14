@@ -46,26 +46,6 @@ const UV_SearchResults: React.FC = () => {
         params.append(key, value);
       });
       
-      // Add arrays as comma-separated if they exist
-      if (selectedTypes.length > 0) {
-        params.set('property_types', selectedTypes.join(','));
-      }
-      if (selectedAmenities.length > 0) {
-        params.set('amenities', selectedAmenities.join(','));
-      }
-      if (bedrooms > 0) {
-        params.set('bedrooms', bedrooms.toString());
-      }
-      if (bathrooms > 0) {
-        params.set('bathrooms', bathrooms.toString());
-      }
-      if (priceRange[0] > 0) {
-        params.set('price_min', priceRange[0].toString());
-      }
-      if (priceRange[1] < 10000) {
-        params.set('price_max', priceRange[1].toString());
-      }
-      
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/villas?${params.toString()}`
       );
@@ -97,74 +77,52 @@ const UV_SearchResults: React.FC = () => {
   useEffect(() => {
     if (priceMin || priceMax) {
       setPriceRange([parseInt(priceMin || '0') || 0, parseInt(priceMax || '10000') || 10000]);
+    } else {
+      setPriceRange([0, 10000]);
     }
     if (propertyTypes) {
       setSelectedTypes(propertyTypes.split(','));
+    } else {
+      setSelectedTypes([]);
     }
     if (amenities) {
       setSelectedAmenities(amenities.split(','));
+    } else {
+      setSelectedAmenities([]);
     }
     if (bedroomsParam) {
       setBedrooms(parseInt(bedroomsParam));
+    } else {
+      setBedrooms(0);
     }
     if (bathroomsParam) {
       setBathrooms(parseInt(bathroomsParam));
+    } else {
+      setBathrooms(0);
     }
   }, [priceMin, priceMax, propertyTypes, amenities, bedroomsParam, bathroomsParam]);
 
-  // Update URL parameters when filters change
-  const updateFilters = useCallback(() => {
+  // Reset all filters to initial state
+  const resetFilters = useCallback(() => {
+    setPriceRange([0, 10000]);
+    setSelectedTypes([]);
+    setSelectedAmenities([]);
+    setBedrooms(0);
+    setBathrooms(0);
+    
+    // Keep the basic search parameters (location, dates, guests) but remove filter parameters
     const newParams = new URLSearchParams(searchParams);
-    
-    // Update price range
-    if (priceRange[0] > 0) {
-      newParams.set('price_min', priceRange[0].toString());
-    } else {
-      newParams.delete('price_min');
-    }
-    if (priceRange[1] < 10000) {
-      newParams.set('price_max', priceRange[1].toString());
-    } else {
-      newParams.delete('price_max');
-    }
-    
-    // Update property types
-    if (selectedTypes.length > 0) {
-      newParams.set('property_types', selectedTypes.join(','));
-    } else {
-      newParams.delete('property_types');
-    }
-    
-    // Update amenities
-    if (selectedAmenities.length > 0) {
-      newParams.set('amenities', selectedAmenities.join(','));
-    } else {
-      newParams.delete('amenities');
-    }
-    
-    // Update rooms
-    if (bedrooms > 0) {
-      newParams.set('bedrooms', bedrooms.toString());
-    } else {
-      newParams.delete('bedrooms');
-    }
-    if (bathrooms > 0) {
-      newParams.set('bathrooms', bathrooms.toString());
-    } else {
-      newParams.delete('bathrooms');
-    }
+    newParams.delete('price_min');
+    newParams.delete('price_max');
+    newParams.delete('property_types');
+    newParams.delete('amenities');
+    newParams.delete('bedrooms');
+    newParams.delete('bathrooms');
     
     setSearchParams(newParams);
-  }, [priceRange, selectedTypes, selectedAmenities, bedrooms, bathrooms, searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams]);
 
-  // Debounced filter updates
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      updateFilters();
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [updateFilters]);
+  
 
   // Format date range for display
   const formatDateRange = () => {
@@ -248,7 +206,15 @@ const UV_SearchResults: React.FC = () => {
             {/* Filter Sidebar */}
             <div className="w-80 flex-shrink-0">
               <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900">{language === 'ar' ? 'الفلاتر' : 'Filters'}</h2>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold text-gray-900">{language === 'ar' ? 'الفلاتر' : 'Filters'}</h2>
+                  <button
+                    onClick={resetFilters}
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    {language === 'ar' ? 'إعادة تعيين' : 'Reset'}
+                  </button>
+                </div>
                 
                 {/* Price Range */}
                 <div>
@@ -262,7 +228,23 @@ const UV_SearchResults: React.FC = () => {
                       max="10000"
                       step="50"
                       value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                      onChange={(e) => {
+                        const newRange = [priceRange[0], parseInt(e.target.value)];
+                        setPriceRange(newRange);
+                        // Update URL immediately
+                        const newParams = new URLSearchParams(searchParams);
+                        if (newRange[0] > 0) {
+                          newParams.set('price_min', newRange[0].toString());
+                        } else {
+                          newParams.delete('price_min');
+                        }
+                        if (newRange[1] < 10000) {
+                          newParams.set('price_max', newRange[1].toString());
+                        } else {
+                          newParams.delete('price_max');
+                        }
+                        setSearchParams(newParams);
+                      }}
                       className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                     />
                     <div className="flex justify-between mt-2 text-sm text-gray-600">
@@ -284,11 +266,22 @@ const UV_SearchResults: React.FC = () => {
                           type="checkbox"
                           checked={selectedTypes.includes(type.value)}
                           onChange={(e) => {
+                            let newSelectedTypes;
                             if (e.target.checked) {
-                              setSelectedTypes([...selectedTypes, type.value]);
+                              newSelectedTypes = [...selectedTypes, type.value];
                             } else {
-                              setSelectedTypes(selectedTypes.filter(t => t !== type.value));
+                              newSelectedTypes = selectedTypes.filter(t => t !== type.value);
                             }
+                            setSelectedTypes(newSelectedTypes);
+                            
+                            // Update URL immediately
+                            const newParams = new URLSearchParams(searchParams);
+                            if (newSelectedTypes.length > 0) {
+                              newParams.set('property_types', newSelectedTypes.join(','));
+                            } else {
+                              newParams.delete('property_types');
+                            }
+                            setSearchParams(newParams);
                           }}
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
@@ -310,11 +303,22 @@ const UV_SearchResults: React.FC = () => {
                           type="checkbox"
                           checked={selectedAmenities.includes(amenity.name)}
                           onChange={(e) => {
+                            let newSelectedAmenities;
                             if (e.target.checked) {
-                              setSelectedAmenities([...selectedAmenities, amenity.name]);
+                              newSelectedAmenities = [...selectedAmenities, amenity.name];
                             } else {
-                              setSelectedAmenities(selectedAmenities.filter(a => a !== amenity.name));
+                              newSelectedAmenities = selectedAmenities.filter(a => a !== amenity.name);
                             }
+                            setSelectedAmenities(newSelectedAmenities);
+                            
+                            // Update URL immediately
+                            const newParams = new URLSearchParams(searchParams);
+                            if (newSelectedAmenities.length > 0) {
+                              newParams.set('amenities', newSelectedAmenities.join(','));
+                            } else {
+                              newParams.delete('amenities');
+                            }
+                            setSearchParams(newParams);
                           }}
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
@@ -331,7 +335,19 @@ const UV_SearchResults: React.FC = () => {
                   </label>
                   <select
                     value={bedrooms}
-                    onChange={(e) => setBedrooms(parseInt(e.target.value))}
+                    onChange={(e) => {
+                      const newBedrooms = parseInt(e.target.value);
+                      setBedrooms(newBedrooms);
+                      
+                      // Update URL immediately
+                      const newParams = new URLSearchParams(searchParams);
+                      if (newBedrooms > 0) {
+                        newParams.set('bedrooms', newBedrooms.toString());
+                      } else {
+                        newParams.delete('bedrooms');
+                      }
+                      setSearchParams(newParams);
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="0">{language === 'ar' ? 'أي' : 'Any'}</option>
@@ -348,7 +364,19 @@ const UV_SearchResults: React.FC = () => {
                   </label>
                   <select
                     value={bathrooms}
-                    onChange={(e) => setBathrooms(parseInt(e.target.value))}
+                    onChange={(e) => {
+                      const newBathrooms = parseInt(e.target.value);
+                      setBathrooms(newBathrooms);
+                      
+                      // Update URL immediately
+                      const newParams = new URLSearchParams(searchParams);
+                      if (newBathrooms > 0) {
+                        newParams.set('bathrooms', newBathrooms.toString());
+                      } else {
+                        newParams.delete('bathrooms');
+                      }
+                      setSearchParams(newParams);
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="0">{language === 'ar' ? 'أي' : 'Any'}</option>
@@ -411,12 +439,12 @@ const UV_SearchResults: React.FC = () => {
                       : 'Try adjusting your search filters to find more options'
                     }
                   </p>
-                  <Link
-                    to="/"
+                  <button
+                    onClick={resetFilters}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     {language === 'ar' ? 'بحث جديد' : 'New search'}
-                  </Link>
+                  </button>
                 </div>
               ) : viewMode === 'map' ? (
                 // Map View
