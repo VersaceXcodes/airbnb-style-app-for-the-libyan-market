@@ -742,7 +742,12 @@ app.get('/api/villas', async (req, res) => {
     }
 
     if (property_types) {
-      const types = Array.isArray(property_types) ? property_types : [property_types];
+      // Handle both string and array formats for property_types
+      const types = Array.isArray(property_types) 
+        ? property_types 
+        : typeof property_types === 'string' 
+          ? property_types.split(',') 
+          : [property_types];
       query += ` AND v.property_type = ANY($${paramCount})`;
       params.push(types);
       paramCount++;
@@ -775,7 +780,12 @@ app.get('/api/villas', async (req, res) => {
 
     // Filter by amenities if provided
     if (amenities) {
-      const amenityList = Array.isArray(amenities) ? amenities : [amenities];
+      // Handle both string and array formats for amenities
+      const amenityList = Array.isArray(amenities) 
+        ? amenities 
+        : typeof amenities === 'string' 
+          ? amenities.split(',') 
+          : [amenities];
       query += ` AND EXISTS (
         SELECT 1 FROM villa_amenities va 
         JOIN amenities a ON va.amenity_id = a.id 
@@ -1346,11 +1356,22 @@ app.get('/api/villas/:villa_id/availability', async (req, res) => {
     }
 
     query += ' ORDER BY date ASC';
-
-    const result = await client.query(query, params);
+const result = await client.query(query, params);
+    
     client.release();
 
-    res.json(result.rows);
+    // Ensure all villa objects have required properties to prevent frontend errors
+    const processedVillas = result.rows.map(villa => ({
+      ...villa,
+      title: villa.title || 'Untitled Villa',
+      cover_photo_url: villa.cover_photo_url || 'https://picsum.photos/seed/default-villa/400/300.jpg',
+      price_per_night: villa.price_per_night || 0,
+      num_guests: villa.num_guests || 1,
+      num_bedrooms: villa.num_bedrooms || 0,
+      num_bathrooms: villa.num_bathrooms || 0
+    }));
+
+    res.json(processedVillas);
   } catch (error) {
     console.error('Get villa availability error:', error);
     res.status(500).json(createErrorResponse('Failed to get availability', error, 'GET_AVAILABILITY_FAILED'));
