@@ -50,11 +50,17 @@ const UV_SearchResults: React.FC = () => {
         `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/api/villas?${params.toString()}`
       );
       
-      // Transform data to include cover photo URL
+      // Transform data to include cover photo URL and ensure all required properties exist
       return response.data.map((villa: any) => ({
         ...villa,
-        cover_photo_url: villa.cover_photo_url || 'https://picsum.photos/seed/default-villa/400/300.jpg'
-      }));
+        id: villa.id || '',
+        title: villa.title || 'Untitled Villa',
+        cover_photo_url: villa.cover_photo_url || 'https://picsum.photos/seed/default-villa/400/300.jpg',
+        price_per_night: villa.price_per_night || 0,
+        num_guests: villa.num_guests || 1,
+        num_bedrooms: villa.num_bedrooms || 0,
+        num_bathrooms: villa.num_bathrooms || 0
+      })).filter((villa: any) => villa.id); // Filter out any villas without an ID
     },
     staleTime: 60000,
     refetchOnWindowFocus: false,

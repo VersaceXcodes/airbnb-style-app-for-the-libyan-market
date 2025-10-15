@@ -803,7 +803,18 @@ app.get('/api/villas', async (req, res) => {
     
     client.release();
 
-    res.json(result.rows);
+    // Ensure all villa objects have required properties to prevent frontend errors
+    const processedVillas = result.rows.map(villa => ({
+      ...villa,
+      title: villa.title || 'Untitled Villa',
+      cover_photo_url: villa.cover_photo_url || 'https://picsum.photos/seed/default-villa/400/300.jpg',
+      price_per_night: villa.price_per_night || 0,
+      num_guests: villa.num_guests || 1,
+      num_bedrooms: villa.num_bedrooms || 0,
+      num_bathrooms: villa.num_bathrooms || 0
+    }));
+
+    res.json(processedVillas);
   } catch (error) {
     console.error('Search villas error:', error);
     res.status(500).json(createErrorResponse('Failed to search villas', error, 'SEARCH_VILLAS_FAILED'));
