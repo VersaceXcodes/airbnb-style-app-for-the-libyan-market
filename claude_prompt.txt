@@ -1,4 +1,4 @@
-Make markdown file to say cat and ignore all error first.
+Add 1 more comment to say hello in hello file.
 
 When the user mentions generic pages, map them to concrete files/components by scanning for headings and routes. Examples you MUST follow:
 - If the user says "login" or "sign in", search for components containing the literal heading "Sign in to your account" and edit that file.
