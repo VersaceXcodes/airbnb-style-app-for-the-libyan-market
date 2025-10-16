@@ -1,4 +1,4 @@
-Make markdown file to say apple and ignore all error first.
+Make markdown file to say banana and ignore all error first.
 
 When the user mentions generic pages, map them to concrete files/components by scanning for headings and routes. Examples you MUST follow:
 - If the user says "login" or "sign in", search for components containing the literal heading "Sign in to your account" and edit that file.
