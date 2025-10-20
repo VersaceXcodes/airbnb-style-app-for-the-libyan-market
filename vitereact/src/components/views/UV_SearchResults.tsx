@@ -249,31 +249,68 @@ const UV_SearchResults: React.FC = () => {
                     {language === 'ar' ? 'نطاق السعر' : 'Price range'}
                   </label>
                   <div className="px-2">
-                    <input
-                      type="range"
-                      min="0"
-                      max="10000"
-                      step="50"
-                      value={priceRange[1]}
-                      onChange={(e) => {
-                        const newRange = [priceRange[0], parseInt(e.target.value)];
-                        setPriceRange(newRange);
-                        // Update URL immediately
-                        const newParams = new URLSearchParams(searchParams);
-                        if (newRange[0] > 0) {
-                          newParams.set('price_min', newRange[0].toString());
-                        } else {
-                          newParams.delete('price_min');
-                        }
-                        if (newRange[1] < 10000) {
-                          newParams.set('price_max', newRange[1].toString());
-                        } else {
-                          newParams.delete('price_max');
-                        }
-                        setSearchParams(newParams);
-                      }}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
+                    <div className="mb-4">
+                      <label className="block text-xs text-gray-600 mb-1">
+                        {language === 'ar' ? 'السعر الأدنى' : 'Minimum price'}
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10000"
+                        step="50"
+                        value={priceRange[0]}
+                        onChange={(e) => {
+                          const newMin = parseInt(e.target.value);
+                          const newRange = [newMin, Math.max(newMin, priceRange[1])];
+                          setPriceRange(newRange);
+                          // Update URL immediately
+                          const newParams = new URLSearchParams(searchParams);
+                          if (newRange[0] > 0) {
+                            newParams.set('price_min', newRange[0].toString());
+                          } else {
+                            newParams.delete('price_min');
+                          }
+                          if (newRange[1] < 10000) {
+                            newParams.set('price_max', newRange[1].toString());
+                          } else {
+                            newParams.delete('price_max');
+                          }
+                          setSearchParams(newParams);
+                        }}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-xs text-gray-600 mb-1">
+                        {language === 'ar' ? 'السعر الأقصى' : 'Maximum price'}
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10000"
+                        step="50"
+                        value={priceRange[1]}
+                        onChange={(e) => {
+                          const newMax = parseInt(e.target.value);
+                          const newRange = [Math.min(priceRange[0], newMax), newMax];
+                          setPriceRange(newRange);
+                          // Update URL immediately
+                          const newParams = new URLSearchParams(searchParams);
+                          if (newRange[0] > 0) {
+                            newParams.set('price_min', newRange[0].toString());
+                          } else {
+                            newParams.delete('price_min');
+                          }
+                          if (newRange[1] < 10000) {
+                            newParams.set('price_max', newRange[1].toString());
+                          } else {
+                            newParams.delete('price_max');
+                          }
+                          setSearchParams(newParams);
+                        }}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
                     <div className="flex justify-between mt-2 text-sm text-gray-600">
                       <span>${priceRange[0]}</span>
                       <span>${priceRange[1]}</span>
