@@ -70,12 +70,15 @@ interface Review {
   reviewer?: User;
 }
 
-interface VillaResponse {
-  villa: Villa;
-  host: User;
+interface VillaResponse extends Villa {
+  host_name: string;
+  host_photo: string;
+  host_verified: boolean;
+  host_joined_date: string;
+  avg_rating: string | null;
+  review_count: string;
   photos: Photo[];
   amenities: Amenity[];
-  reviews: Review[];
 }
 
 const UV_ListingDetails: React.FC = () => {
@@ -111,7 +114,7 @@ const UV_ListingDetails: React.FC = () => {
   }, []);
 
   // Fetch villa details
-  const { data: villaData, isLoading, error } = useQuery({
+  const { data: villa, isLoading, error } = useQuery({
     queryKey: ['villa', villa_id],
     queryFn: async () => {
       const response = await axios.get<VillaResponse>(
@@ -158,11 +161,11 @@ const UV_ListingDetails: React.FC = () => {
   // };
 
   const calculateTotalPrice = () => {
-    if (!villaData || !bookingDates.check_in || !bookingDates.check_out) return 0;
+    if (!villa || !bookingDates.check_in || !bookingDates.check_out) return 0;
     
     const nights = Math.ceil((bookingDates.check_out.getTime() - bookingDates.check_in.getTime()) / (1000 * 60 * 60 * 24));
-    const nightlyTotal = nights * villaData.villa.price_per_night;
-    const cleaningFee = villaData.villa.cleaning_fee || 0;
+    const nightlyTotal = nights * Number(villa.price_per_night);
+    const cleaningFee = villa.cleaning_fee ? Number(villa.cleaning_fee) : 0;
     
     return nightlyTotal + cleaningFee;
   };
@@ -195,7 +198,7 @@ const UV_ListingDetails: React.FC = () => {
     );
   }
 
-  if (error || !villaData) {
+  if (error || !villa) {
     return (
       <>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -211,7 +214,8 @@ const UV_ListingDetails: React.FC = () => {
     );
   }
 
-  const { villa, host, photos, amenities, reviews } = villaData;
+  const photos = villa.photos || [];
+  const amenities = villa.amenities || [];
   const coverPhoto = photos.find(p => p.is_cover_photo) || photos[0];
 
   return (
@@ -319,16 +323,16 @@ const UV_ListingDetails: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <img
-                      src={host.profile_picture_url || `https://picsum.photos/seed/${host.id}/100/100.jpg`}
-                      alt={host.name}
+                      src={villa.host_photo || `https://picsum.photos/seed/${villa.host_id}/100/100.jpg`}
+                      alt={villa.host_name}
                       className="w-12 h-12 rounded-full object-cover"
                     />
                     <div>
-                      <h3 className="font-semibold text-gray-900">Hosted by {host.name}</h3>
+                      <h3 className="font-semibold text-gray-900">Hosted by {villa.host_name}</h3>
                       <p className="text-sm text-gray-600">
-                        Joined in {new Date(host.created_at).getFullYear()}
+                        Joined in {new Date(villa.host_joined_date).getFullYear()}
                       </p>
-                      {host.is_phone_verified && (
+                      {villa.host_verified && (
                         <div className="flex items-center mt-1">
                           <svg className="w-4 h-4 text-blue-600 mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -435,46 +439,7 @@ const UV_ListingDetails: React.FC = () => {
                   {activeTab === 'reviews' && (
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Reviews</h3>
-                      {reviews.length > 0 ? (
-                        <div className="space-y-4">
-                          {reviews.map((review) => (
-                            <div key={review.id} className="border-b border-gray-200 pb-4 last:border-0">
-                              <div className="flex items-center space-x-3 mb-2">
-                                <img
-                                  src={review.reviewer?.profile_picture_url || `https://picsum.photos/seed/${review.reviewer_id}/50/50.jpg`}
-                                  alt={review.reviewer?.name}
-                                  className="w-10 h-10 rounded-full object-cover"
-                                />
-                                <div>
-                                  <p className="font-medium text-gray-900">{review.reviewer?.name}</p>
-                                  <div className="flex items-center">
-                                    <div className="flex text-yellow-400">
-                                      {[...Array(5)].map((_, i) => (
-                                        <svg
-                                          key={i}
-                                          className={`w-4 h-4 ${i < review.public_rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                                          fill="currentColor"
-                                          viewBox="0 0 20 20"
-                                        >
-                                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                      ))}
-                                    </div>
-                                    <span className="text-sm text-gray-600 ml-2">
-                                      {new Date(review.created_at).toLocaleDateString()}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              {review.public_comment && (
-                                <p className="text-gray-600">{review.public_comment}</p>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-gray-500">No reviews yet.</p>
-                      )}
+                      <p className="text-gray-500">No reviews yet.</p>
                     </div>
                   )}
                 </div>
@@ -490,12 +455,12 @@ const UV_ListingDetails: React.FC = () => {
                       LYD {villa.price_per_night}
                       <span className="text-sm font-normal text-gray-500"> / night</span>
                     </p>
-                    {reviews.length > 0 && (
+                    {villa.avg_rating && villa.review_count && Number(villa.review_count) > 0 && (
                       <div className="flex items-center mt-1">
                         <svg className="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
-                        <span className="text-sm text-gray-600">4.8 (24 reviews)</span>
+                        <span className="text-sm text-gray-600">{Number(villa.avg_rating).toFixed(1)} ({villa.review_count} reviews)</span>
                       </div>
                     )}
                   </div>
@@ -558,7 +523,7 @@ const UV_ListingDetails: React.FC = () => {
                     <div className="border-t border-b border-gray-200 py-4 space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>LYD {villa.price_per_night} x {calculateNights()} nights</span>
-                        <span>LYD {villa.price_per_night * calculateNights()}</span>
+                        <span>LYD {Number(villa.price_per_night) * calculateNights()}</span>
                       </div>
                       {villa.cleaning_fee && (
                         <div className="flex justify-between text-sm">
