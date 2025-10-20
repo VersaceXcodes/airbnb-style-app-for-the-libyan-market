@@ -363,7 +363,7 @@ const UV_SearchResults: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-3">
                     {language === 'ar' ? 'المرافق' : 'Amenities'}
                   </label>
-                  <div className="space-y-2 max-h-64 overflow-y-auto" role="group" aria-label="Amenities filter">
+                  <div className="space-y-2" role="group" aria-label="Amenities filter">
                     {amenitiesList.map(amenity => (
                       <label key={amenity.id} className="flex items-center cursor-pointer">
                         <input
@@ -381,7 +381,6 @@ const UV_SearchResults: React.FC = () => {
                             }
                             setSelectedAmenities(newSelectedAmenities);
                             
-                            // Update URL immediately
                             const newParams = new URLSearchParams(searchParams);
                             if (newSelectedAmenities.length > 0) {
                               newParams.set('amenities', newSelectedAmenities.join(','));
