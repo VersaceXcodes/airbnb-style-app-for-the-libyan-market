@@ -123,7 +123,8 @@ INSERT INTO users (id, name, email, password_hash, phone_number, account_type, i
 ('user_006', 'Emily Davis', 'emily.davis@email.com', 'password123', '+1234567895', 'guest', true, NULL, '2024-01-20T08:30:00Z', '2024-01-20T08:30:00Z'),
 ('user_007', 'Robert Wilson', 'robert.wilson@email.com', 'user123', '+1234567896', 'guest', true, 'https://picsum.photos/seed/user007/200/200.jpg', '2024-01-21T12:10:00Z', '2024-01-21T12:10:00Z'),
 ('user_008', 'Lisa Anderson', 'lisa.anderson@email.com', 'password123', '+1234567897', 'host', true, 'https://picsum.photos/seed/user008/200/200.jpg', '2024-01-22T17:25:00Z', '2024-01-22T17:25:00Z'),
-('user_009', 'Test User', 'versacecodes@gmail.com', 'Airplanes@99', '+1234567898', 'guest', true, 'https://picsum.photos/seed/user009/200/200.jpg', '2024-01-23T10:00:00Z', '2024-01-23T10:00:00Z')
+('user_009', 'Test User', 'versacecodes@gmail.com', 'Airplanes@99', '+1234567898', 'guest', true, 'https://picsum.photos/seed/user009/200/200.jpg', '2024-01-23T10:00:00Z', '2024-01-23T10:00:00Z'),
+('user_010', 'Test Signup User', 'test.signup@example.com', 'TestPass123!', '+1234567899', 'guest', true, 'https://picsum.photos/seed/user010/200/200.jpg', '2024-01-24T10:00:00Z', '2024-01-24T10:00:00Z')
 ON CONFLICT (id) DO NOTHING;
 
 -- Villas table

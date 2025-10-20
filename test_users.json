@@ -10,8 +10,8 @@
     "identifier_fields": ["email", "phone_number"],
     "password_field": "password_hash"
   },
-  "total_users": 9,
-  "verified_users": 9,
+  "total_users": 10,
+  "verified_users": 10,
   "notes": [
     "All users are seeded from backend/db.sql",
     "Passwords are stored in plain text for development (password_hash field)",
@@ -126,6 +126,18 @@
       "profile_picture_url": "https://picsum.photos/seed/user009/200/200.jpg",
       "verified": true,
       "description": "Test user for browser automation"
+    },
+    {
+      "id": "user_010",
+      "name": "Test Signup User",
+      "email": "test.signup@example.com",
+      "phone_number": "+1234567899",
+      "password": "TestPass123!",
+      "account_type": "guest",
+      "is_phone_verified": true,
+      "profile_picture_url": "https://picsum.photos/seed/user010/200/200.jpg",
+      "verified": true,
+      "description": "Test user for booking flow automation"
     }
   ],
   "by_role": {
@@ -203,6 +215,14 @@
         "password": "Airplanes@99",
         "verified": true,
         "description": "Test user for browser automation"
+      },
+      {
+        "id": "user_010",
+        "email": "test.signup@example.com",
+        "phone_number": "+1234567899",
+        "password": "TestPass123!",
+        "verified": true,
+        "description": "Test user for booking flow automation"
       }
     ]
   },
