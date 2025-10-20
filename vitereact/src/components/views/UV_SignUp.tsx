@@ -139,6 +139,7 @@ const UV_SignUp: React.FC = () => {
       if (errorMsg.includes('temporarily unavailable')) {
         setLocalError('Registration server is temporarily unavailable. Please try again in a few moments.');
       } else if (errorMsg.includes('already exists') || errorMsg.includes('User already exists')) {
+        clearAuthError();
         setLocalError('An account with this phone number or email already exists. Redirecting to login...');
         setTimeout(() => {
           navigate('/login');
