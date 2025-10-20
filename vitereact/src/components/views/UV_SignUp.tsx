@@ -61,8 +61,9 @@ const UV_SignUp: React.FC = () => {
       return false;
     }
 
-    if (!signUpForm.phone_number || signUpForm.phone_number.length < 13) {
-      setLocalError('Valid phone number is required');
+    const phoneDigits = signUpForm.phone_number.replace(/\D/g, '');
+    if (!signUpForm.phone_number || phoneDigits.length < 9) {
+      setLocalError('Valid phone number is required (minimum 9 digits)');
       return false;
     }
 
@@ -266,8 +267,9 @@ const UV_SignUp: React.FC = () => {
                     value={signUpForm.phone_number}
                     onChange={(e) => handleInputChange('phone_number', e.target.value)}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
-                    placeholder="+218 XX XXXXXXX"
+                    placeholder="+218 91 1234567"
                   />
+                  <p className="mt-1 text-xs text-gray-500">Enter in format: +218 XX XXXXXXX or 091XXXXXXX</p>
                 </div>
 
                 {/* Email */}

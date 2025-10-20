@@ -19,7 +19,12 @@ export const createUserInputSchema = z.object({
   name: z.string().min(1).max(255),
   email: z.string().email().nullable(),
   password_hash: z.string().min(8),
-  phone_number: z.string().min(10),
+  phone_number: z.string().refine((val) => {
+    const digits = val.replace(/\D/g, '');
+    return digits.length >= 9;
+  }, {
+    message: "Phone number must contain at least 9 digits"
+  }),
   account_type: z.enum(['guest', 'host', 'admin']).default('guest'),
   profile_picture_url: z.string().url().nullable().optional()
 });
@@ -28,7 +33,12 @@ export const updateUserInputSchema = z.object({
   id: z.string(),
   name: z.string().min(1).max(255).optional(),
   email: z.string().email().nullable().optional(),
-  phone_number: z.string().min(10).optional(),
+  phone_number: z.string().refine((val) => {
+    const digits = val.replace(/\D/g, '');
+    return digits.length >= 9;
+  }, {
+    message: "Phone number must contain at least 9 digits"
+  }).optional(),
   profile_picture_url: z.string().url().nullable().optional(),
   is_phone_verified: z.boolean().optional()
 });
