@@ -29,17 +29,7 @@ interface Villa {
   updated_at: string;
 }
 
-interface User {
-  id: string;
-  name: string;
-  email: string | null;
-  phone_number: string;
-  account_type: string;
-  is_phone_verified: boolean;
-  profile_picture_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
+
 
 interface Photo {
   id: string;
@@ -57,18 +47,7 @@ interface Amenity {
   icon_name: string | null;
 }
 
-interface Review {
-  id: string;
-  booking_id: string;
-  reviewer_id: string;
-  reviewee_id: string;
-  public_rating: number;
-  public_comment: string | null;
-  private_feedback: string | null;
-  is_visible: boolean;
-  created_at: string;
-  reviewer?: User;
-}
+
 
 interface VillaResponse extends Villa {
   host_name: string;
@@ -98,6 +77,7 @@ const UV_ListingDetails: React.FC = () => {
   });
   const [activeTab, setActiveTab] = useState('description');
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   // Initialize booking dates from URL params
   useEffect(() => {
@@ -239,6 +219,7 @@ const UV_ListingDetails: React.FC = () => {
                   <button
                     onClick={() => setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length)}
                     className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all"
+                    aria-label="Previous photo"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -247,6 +228,7 @@ const UV_ListingDetails: React.FC = () => {
                   <button
                     onClick={() => setCurrentPhotoIndex((prev) => (prev + 1) % photos.length)}
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all"
+                    aria-label="Next photo"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -261,6 +243,20 @@ const UV_ListingDetails: React.FC = () => {
                   {currentPhotoIndex + 1} / {photos.length}
                 </div>
               )}
+              
+              {/* View All Photos Button */}
+              {photos.length > 1 && (
+                <button
+                  onClick={() => setIsGalleryOpen(true)}
+                  className="absolute bottom-4 right-4 bg-white hover:bg-gray-100 text-gray-800 px-4 py-2 rounded-lg shadow-lg transition-all flex items-center space-x-2"
+                  aria-label="View all photos"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="font-medium">View all photos</span>
+                </button>
+              )}
             </>
           ) : (
             <div className="h-96 bg-gray-200 flex items-center justify-center">
@@ -268,6 +264,46 @@ const UV_ListingDetails: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Photo Gallery Modal */}
+        {isGalleryOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-90 z-50 overflow-y-auto">
+            <div className="min-h-screen px-4 py-8">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-white text-xl font-semibold">All Photos ({photos.length})</h2>
+                <button
+                  onClick={() => setIsGalleryOpen(false)}
+                  className="text-white hover:text-gray-300 p-2"
+                  aria-label="Close gallery"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {photos.map((photo, index) => (
+                  <div key={photo.id} className="relative group">
+                    <img
+                      src={photo.url}
+                      alt={photo.description || `Photo ${index + 1}`}
+                      className="w-full h-64 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => {
+                        setCurrentPhotoIndex(index);
+                        setIsGalleryOpen(false);
+                      }}
+                    />
+                    {photo.description && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 rounded-b-lg">
+                        <p className="text-sm">{photo.description}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
