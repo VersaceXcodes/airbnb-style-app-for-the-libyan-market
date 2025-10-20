@@ -62,7 +62,10 @@ const { DATABASE_URL, PGHOST, PGDATABASE, PGUSER, PGPASSWORD, PGPORT = 5432, JWT
 const poolConfig: PoolConfig = DATABASE_URL
   ? { 
       connectionString: DATABASE_URL, 
-      ssl: { rejectUnauthorized: false } 
+      ssl: { rejectUnauthorized: false },
+      connectionTimeoutMillis: 10000,
+      idleTimeoutMillis: 30000,
+      max: 20
     }
   : {
       host: PGHOST,
@@ -71,6 +74,9 @@ const poolConfig: PoolConfig = DATABASE_URL
       password: PGPASSWORD,
       port: Number(PGPORT),
       ssl: { rejectUnauthorized: false },
+      connectionTimeoutMillis: 10000,
+      idleTimeoutMillis: 30000,
+      max: 20
     };
 
 // Initialize database pool with error handling
@@ -111,6 +117,13 @@ app.use(cors({
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'));
+
+// Request timeout middleware
+app.use((req, res, next) => {
+  req.setTimeout(30000);
+  res.setTimeout(30000);
+  next();
+});
 
 // Security headers
 app.use((req, res, next) => {
@@ -659,7 +672,9 @@ app.get('/api/users/me/trips', authenticateToken, async (req, res) => {
 
 // GET /api/villas - Search and filter properties
 app.get('/api/villas', async (req, res) => {
+  let client;
   try {
+    console.log('[API] GET /api/villas - Query params:', req.query);
     const {
       location,
       check_in,
@@ -698,7 +713,15 @@ app.get('/api/villas', async (req, res) => {
     const bathroomsInt = parseInt(bathrooms as string);
     const parsedBathrooms = bathrooms && !isNaN(bathroomsInt) && bathroomsInt >= 0 ? bathroomsInt : undefined;
 
-    const client = await pool.connect();
+    console.log('[API] Parsed params:', { 
+      location, 
+      parsedNumGuests, 
+      parsedLimit, 
+      parsedOffset 
+    });
+
+    client = await pool.connect();
+    console.log('[API] Database connection acquired');
     
     let query = `
       SELECT DISTINCT v.*, 
@@ -799,9 +822,12 @@ app.get('/api/villas', async (req, res) => {
     query += ` ORDER BY v.created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
     params.push(parsedLimit, parsedOffset);
 
+    console.log('[API] Executing query with params:', params);
     const result = await client.query(query, params);
+    console.log('[API] Query returned', result.rows.length, 'results');
     
     client.release();
+    console.log('[API] Database connection released');
 
     // Ensure all villa objects have required properties to prevent frontend errors
     const processedVillas = result.rows.map(villa => ({
@@ -815,8 +841,17 @@ app.get('/api/villas', async (req, res) => {
     }));
 
     res.json(processedVillas);
+    console.log('[API] Response sent successfully');
   } catch (error) {
-    console.error('Search villas error:', error);
+    console.error('[API] Search villas error:', error);
+    if (client) {
+      try {
+        client.release();
+        console.log('[API] Database connection released after error');
+      } catch (releaseError) {
+        console.error('[API] Error releasing connection:', releaseError);
+      }
+    }
     res.status(500).json(createErrorResponse('Failed to search villas', error, 'SEARCH_VILLAS_FAILED'));
   }
 });
