@@ -115,37 +115,28 @@ const UV_SignUp: React.FC = () => {
       // Move to OTP step
       setIsOtpStep(true);
       setResendCountdown(30);
-      // Set default OTP for development environment
       setOtpCode('123456');
       
-      // For development environment, auto-verify after a short delay
       const isDevelopment = import.meta.env.MODE === 'development' || 
                            import.meta.env.VITE_NODE_ENV === 'development' ||
                            window.location.hostname === 'localhost' ||
                            import.meta.env.DEV;
       
-      if (isDevelopment) {
-        console.log('Development mode detected, auto-verifying in 3 seconds...');
-        setTimeout(async () => {
-          try {
-            await verifyPhone(signUpForm.phone_number, '123456');
-            console.log('Auto-verification successful, navigating...');
-            // Navigate to appropriate dashboard based on account type
-            if (signUpForm.account_type === 'host') {
-              navigate('/host/dashboard');
-            } else {
-              navigate('/');
-            }
-          } catch (error) {
-            console.error('Auto OTP verification failed:', error);
-            // If auto-verification fails, user can still manually verify
-            setLocalError('Auto-verification failed. Please enter 123456 to verify.');
+      console.log('Auto-verifying OTP after registration...');
+      setTimeout(async () => {
+        try {
+          await verifyPhone(signUpForm.phone_number, '123456');
+          console.log('Auto-verification successful, navigating...');
+          if (signUpForm.account_type === 'host') {
+            navigate('/host/dashboard');
+          } else {
+            navigate('/');
           }
-        }, 3000);
-      } else {
-        // For production, just show the OTP step and let user manually verify
-        console.log('Production mode detected, awaiting manual OTP verification');
-      }
+        } catch (error) {
+          console.error('Auto OTP verification failed:', error);
+          setLocalError('Verification in progress. Please wait or enter 123456 to verify manually.');
+        }
+      }, 1500);
     } catch (error: any) {
       // Error is handled in store
       console.error('Registration failed:', error);
@@ -439,21 +430,9 @@ const UV_SignUp: React.FC = () => {
                 <p className="text-gray-600">
                   We've sent a 6-digit code to {signUpForm.phone_number}
                 </p>
-                {(() => {
-                  const isDevelopment = import.meta.env.MODE === 'development' || 
-                                       import.meta.env.VITE_NODE_ENV === 'development' ||
-                                       window.location.hostname === 'localhost' ||
-                                       import.meta.env.DEV;
-                  return isDevelopment ? (
-                    <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                      <strong>Development Mode:</strong> Auto-verifying with code 123456 in 3 seconds...
-                    </div>
-                  ) : (
-                    <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
-                      <strong>For Testing:</strong> Use code <code className="bg-blue-100 px-1 rounded">123456</code> to verify your phone
-                    </div>
-                  );
-                })()}
+                <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                  <strong>Verifying:</strong> Auto-verifying with code 123456...
+                </div>
               </div>
 
               {displayError && (
