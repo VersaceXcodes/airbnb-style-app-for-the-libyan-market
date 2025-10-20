@@ -172,6 +172,14 @@ const App: React.FC = () => {
             } 
           />
           <Route 
+            path="/inbox" 
+            element={
+              <ProtectedRoute>
+                <PublicLayout><UV_Inbox /></PublicLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/inbox/:thread_id" 
             element={
               <ProtectedRoute>

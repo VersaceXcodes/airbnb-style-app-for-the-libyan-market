@@ -578,7 +578,7 @@ const UV_ListingDetails: React.FC = () => {
                   <button
                     onClick={handleRequestToBook}
                     className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={!currentUser && !!currentUser}
+                    disabled={false}
                   >
                     {currentUser ? 'Request to Book' : 'Log in to Book'}
                   </button>
