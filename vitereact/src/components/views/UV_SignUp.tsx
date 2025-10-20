@@ -134,13 +134,17 @@ const UV_SignUp: React.FC = () => {
     } catch (error: any) {
       console.error('Registration failed:', error);
       
-      if (error.message.includes('temporarily unavailable')) {
+      const errorMsg = error.message || '';
+      
+      if (errorMsg.includes('temporarily unavailable')) {
         setLocalError('Registration server is temporarily unavailable. Please try again in a few moments.');
-      } else if (error.message.includes('already exists')) {
-        setLocalError('An account with this phone number or email already exists. Please login instead.');
+      } else if (errorMsg.includes('already exists') || errorMsg.includes('User already exists')) {
+        setLocalError('An account with this phone number or email already exists. Redirecting to login...');
         setTimeout(() => {
           navigate('/login');
         }, 2000);
+      } else {
+        setLocalError(errorMsg || 'Registration failed. Please try again.');
       }
     }
   };
