@@ -323,11 +323,14 @@ const UV_SearchResults: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-3">
                     {language === 'ar' ? 'نوع العقار' : 'Property type'}
                   </label>
-                  <div className="space-y-2">
+                  <div className="space-y-2" role="group" aria-label="Property type filter">
                     {propertyTypeOptions.map(type => (
-                      <label key={type.value} className="flex items-center">
+                      <label key={type.value} className="flex items-center cursor-pointer">
                         <input
                           type="checkbox"
+                          id={`property-type-${type.value}`}
+                          name={`property-type-${type.value}`}
+                          aria-label={`Filter by ${type.label}`}
                           checked={selectedTypes.includes(type.value)}
                           onChange={(e) => {
                             let newSelectedTypes;
@@ -360,11 +363,14 @@ const UV_SearchResults: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-3">
                     {language === 'ar' ? 'المرافق' : 'Amenities'}
                   </label>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                  <div className="space-y-2 max-h-64 overflow-y-auto" role="group" aria-label="Amenities filter">
                     {amenitiesList.map(amenity => (
-                      <label key={amenity.id} className="flex items-center">
+                      <label key={amenity.id} className="flex items-center cursor-pointer">
                         <input
                           type="checkbox"
+                          id={`amenity-${amenity.id}`}
+                          name={`amenity-${amenity.name}`}
+                          aria-label={`Filter by ${amenity.name}`}
                           checked={selectedAmenities.includes(amenity.name)}
                           onChange={(e) => {
                             let newSelectedAmenities;
