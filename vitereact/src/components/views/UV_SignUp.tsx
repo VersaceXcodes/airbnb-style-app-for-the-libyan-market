@@ -112,15 +112,9 @@ const UV_SignUp: React.FC = () => {
 
       console.log('Registration successful, moving to OTP step...');
 
-      // Move to OTP step
       setIsOtpStep(true);
       setResendCountdown(30);
       setOtpCode('123456');
-      
-      const isDevelopment = import.meta.env.MODE === 'development' || 
-                           import.meta.env.VITE_NODE_ENV === 'development' ||
-                           window.location.hostname === 'localhost' ||
-                           import.meta.env.DEV;
       
       console.log('Auto-verifying OTP after registration...');
       setTimeout(async () => {
@@ -138,12 +132,15 @@ const UV_SignUp: React.FC = () => {
         }
       }, 1500);
     } catch (error: any) {
-      // Error is handled in store
       console.error('Registration failed:', error);
       
-      // If it's a 502 error, show a more helpful message
       if (error.message.includes('temporarily unavailable')) {
         setLocalError('Registration server is temporarily unavailable. Please try again in a few moments.');
+      } else if (error.message.includes('already exists')) {
+        setLocalError('An account with this phone number or email already exists. Please login instead.');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       }
     }
   };
