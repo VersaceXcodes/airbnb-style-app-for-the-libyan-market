@@ -141,8 +141,10 @@ const UV_SignUp: React.FC = () => {
       } else if (errorMsg.includes('already exists') || errorMsg.includes('User already exists')) {
         clearAuthError();
         setLocalError('An account with this phone number or email already exists. Redirecting to login...');
+        console.log('User already exists - will redirect to login in 2 seconds');
         setTimeout(() => {
-          navigate('/login');
+          console.log('Executing navigation to /login');
+          window.location.href = '/login';
         }, 2000);
       } else {
         setLocalError(errorMsg || 'Registration failed. Please try again.');
