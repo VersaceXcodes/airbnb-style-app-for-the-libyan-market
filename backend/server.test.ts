@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { jest } from '@jest/globals';
-import { app, server, pool } from './server.ts';
+import { app, server, pool } from './server.js';
 import * as jwt from 'jsonwebtoken';
 
 // Create mock functions

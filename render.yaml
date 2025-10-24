@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: airbnb-libya-app
+    env: node
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: FRONTEND_URL
+        value: https://123airbnb-style-app-for-the-libyan-market.launchpulse.ai
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false

@@ -45,7 +45,7 @@ import {
   reviewSchema,
   createReviewInputSchema,
   updateReviewInputSchema
-} from './schema.ts';
+} from './schema.js';
 
 dotenv.config();
 
@@ -100,14 +100,32 @@ pool.on('error', (err) => {
 });
 
 // Enhanced middleware setup with better CORS and error handling
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'https://123airbnb-style-app-for-the-libyan-market.launchpulse.ai'
+];
+
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+if (process.env.ALLOWED_ORIGINS) {
+  allowedOrigins.push(...process.env.ALLOWED_ORIGINS.split(','));
+}
+
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
-    process.env.ALLOWED_ORIGINS,
-    'https://123airbnb-style-app-for-the-libyan-market.launchpulse.ai',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000'
-  ].filter(Boolean),
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked for origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
@@ -117,6 +135,13 @@ app.use(cors({
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'));
+
+// Enhanced request logging for debugging
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - ${req.headers.origin || 'no-origin'}`);
+  console.log(`[Request Headers] ${JSON.stringify(req.headers, null, 2)}`);
+  next();
+});
 
 // Request timeout middleware
 app.use((req, res, next) => {
@@ -2146,6 +2171,12 @@ app.use('/api/storage', express.static(storageDir));
 // Global error handler
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   console.error('Global error handler:', error);
+  console.error('Request details:', {
+    method: req.method,
+    url: req.url,
+    headers: req.headers,
+    body: req.body
+  });
   
   if (res.headersSent) {
     return next(error);

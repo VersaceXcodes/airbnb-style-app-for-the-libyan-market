@@ -9,6 +9,7 @@
     "start": "nodemon --exec \"tsx\" server.ts",
     "build": "tsc",
     "dev": "tsx server.ts",
+    "prod": "node start-prod.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
