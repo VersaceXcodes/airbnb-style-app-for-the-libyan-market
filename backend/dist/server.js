@@ -68,6 +68,7 @@ if (process.env.FRONTEND_URL) {
 if (process.env.ALLOWED_ORIGINS) {
     allowedOrigins.push(...process.env.ALLOWED_ORIGINS.split(','));
 }
+// CORS middleware that adds proper headers to responses
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (mobile apps, curl, etc.)
@@ -86,6 +87,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
     exposedHeaders: ['X-Total-Count'],
 }));
+// Enhanced JSON parsing with better error handling
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'));
@@ -115,7 +117,7 @@ app.use(express.static(path.join(__dirname, 'public'), {
         if (filePath.endsWith('.js')) {
             res.setHeader('Content-Type', 'application/javascript');
         }
-        else if (filePath.endsWith('.css')) {
+        else if (filePath.endsWith('css')) {
             res.setHeader('Content-Type', 'text/css');
         }
         else if (filePath.endsWith('.html')) {
@@ -123,6 +125,22 @@ app.use(express.static(path.join(__dirname, 'public'), {
         }
     }
 }));
+// SPA catch-all: serve index.html for all non-API routes
+app.get('*', (req, res) => {
+    setHeaders: (res, filePath) => {
+        // Set correct MIME types for JavaScript modules
+        if (filePath.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript');
+        }
+        else if (filePath.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css');
+        }
+        else if (filePath.endsWith('.html')) {
+            res.setHeader('Content-Type', 'text/html');
+        }
+    };
+});
+;
 // Create storage directory if it doesn't exist
 const storageDir = path.join(__dirname, 'storage');
 if (!fs.existsSync(storageDir)) {
