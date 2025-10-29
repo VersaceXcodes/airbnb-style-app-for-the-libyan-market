@@ -261,7 +261,7 @@ const UV_SearchResults: React.FC = () => {
                         value={priceRange[0]}
                         onChange={(e) => {
                           const newMin = parseInt(e.target.value);
-                          const newRange = [newMin, Math.max(newMin, priceRange[1])];
+                          const newRange: [number, number] = [newMin, Math.max(newMin, priceRange[1])];
                           setPriceRange(newRange);
                           // Update URL immediately
                           const newParams = new URLSearchParams(searchParams);
@@ -292,7 +292,7 @@ const UV_SearchResults: React.FC = () => {
                         value={priceRange[1]}
                         onChange={(e) => {
                           const newMax = parseInt(e.target.value);
-                          const newRange = [Math.min(priceRange[0], newMax), newMax];
+                          const newRange: [number, number] = [Math.min(priceRange[0], newMax), newMax];
                           setPriceRange(newRange);
                           // Update URL immediately
                           const newParams = new URLSearchParams(searchParams);
