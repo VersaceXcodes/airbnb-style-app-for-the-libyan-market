@@ -17,6 +17,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 const port = Number(process.env.PORT) || 3000;
+// Storage configuration for multer
+const storageDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(storageDir)) {
+    fs.mkdirSync(storageDir, { recursive: true });
+}
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, storageDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
 // Database configuration
 const { DATABASE_URL, PGHOST, PGDATABASE, PGUSER, PGPASSWORD, PGPORT = 5432, JWT_SECRET = 'your-secret-key' } = process.env;
 const poolConfig = DATABASE_URL
@@ -127,33 +141,8 @@ app.use(express.static(path.join(__dirname, 'public'), {
 }));
 // SPA catch-all: serve index.html for all non-API routes
 app.get('*', (req, res) => {
-    setHeaders: (res, filePath) => {
-        // Set correct MIME types for JavaScript modules
-        if (filePath.endsWith('.js')) {
-            res.setHeader('Content-Type', 'application/javascript');
-        }
-        else if (filePath.endsWith('.css')) {
-            res.setHeader('Content-Type', 'text/css');
-        }
-        else if (filePath.endsWith('.html')) {
-            res.setHeader('Content-Type', 'text/html');
-        }
-    };
-});
-;
-// Create storage directory if it doesn't exist
-const storageDir = path.join(__dirname, 'storage');
-if (!fs.existsSync(storageDir)) {
-    fs.mkdirSync(storageDir, { recursive: true });
-}
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, storageDir);
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    if (!req.path.startsWith('/api')) {
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
     }
 });
 const upload = multer({ storage: storage });
