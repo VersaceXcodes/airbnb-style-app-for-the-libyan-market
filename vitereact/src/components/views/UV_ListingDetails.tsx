@@ -107,18 +107,32 @@ const UV_ListingDetails: React.FC = () => {
     retry: 1
   });
 
+  const [bookingError, setBookingError] = useState<string | null>(null);
+
   const handleRequestToBook = () => {
+    console.log('Request to Book clicked', { 
+      villa_id, 
+      bookingDates, 
+      currentUser: !!currentUser 
+    });
+
+    setBookingError(null);
+
     if (!bookingDates.check_in || !bookingDates.check_out) {
+      console.error('Missing dates for booking');
+      setBookingError('Please select check-in and check-out dates');
       return;
     }
 
     if (!currentUser) {
+      console.log('User not authenticated, redirecting to login');
       const params = new URLSearchParams({
         check_in: bookingDates.check_in.toISOString().split('T')[0],
         check_out: bookingDates.check_out.toISOString().split('T')[0],
         num_guests: bookingDates.num_guests.toString()
       });
       const targetPath = `/booking/request/${villa_id}?${params.toString()}`;
+      console.log('Navigating to login with redirect:', targetPath);
       navigate(`/login?redirect=${encodeURIComponent(targetPath)}`);
       return;
     }
@@ -131,9 +145,11 @@ const UV_ListingDetails: React.FC = () => {
       });
 
       const targetPath = `/booking/request/${villa_id}?${params.toString()}`;
+      console.log('Navigating to booking confirmation:', targetPath);
       navigate(targetPath);
     } catch (error) {
       console.error('Error in handleRequestToBook:', error);
+      setBookingError('An error occurred. Please try again.');
     }
   };
 
@@ -530,8 +546,12 @@ const UV_ListingDetails: React.FC = () => {
                         onChange={(e) => {
                           const date = e.target.value ? new Date(e.target.value) : null;
                           setBookingDates(prev => ({ ...prev, check_in: date }));
+                          setBookingError(null);
                         }}
+                        min={new Date().toISOString().split('T')[0]}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        data-testid="check-in-date"
+                        aria-label="Check-in date"
                       />
                     </div>
                     <div>
@@ -542,8 +562,12 @@ const UV_ListingDetails: React.FC = () => {
                         onChange={(e) => {
                           const date = e.target.value ? new Date(e.target.value) : null;
                           setBookingDates(prev => ({ ...prev, check_out: date }));
+                          setBookingError(null);
                         }}
+                        min={bookingDates.check_in ? new Date(bookingDates.check_in.getTime() + 86400000).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        data-testid="check-out-date"
+                        aria-label="Check-out date"
                       />
                     </div>
                   </div>
@@ -555,6 +579,8 @@ const UV_ListingDetails: React.FC = () => {
                       value={bookingDates.num_guests}
                       onChange={(e) => setBookingDates(prev => ({ ...prev, num_guests: parseInt(e.target.value) }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      data-testid="num-guests"
+                      aria-label="Number of guests"
                     >
                       {[...Array(villa.num_guests)].map((_, i) => (
                         <option key={i + 1} value={i + 1}>
@@ -584,12 +610,20 @@ const UV_ListingDetails: React.FC = () => {
                     </div>
                   )}
 
+                  {/* Booking Error Message */}
+                  {bookingError && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm text-red-700">{bookingError}</p>
+                    </div>
+                  )}
+
                   {/* Book Button */}
                   <button
                     onClick={handleRequestToBook}
                     type="button"
-                    className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={!bookingDates.check_in || !bookingDates.check_out}
+                    className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    data-testid="request-to-book-button"
+                    aria-label="Request to Book"
                   >
                     Request to Book
                   </button>

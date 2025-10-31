@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
@@ -51,6 +51,16 @@ const UV_BookingConfirmation: React.FC = () => {
   const check_in = searchParams.get('check_in');
   const check_out = searchParams.get('check_out');
   const num_guests = searchParams.get('num_guests');
+
+  // Validate that we have required parameters
+  useEffect(() => {
+    if (!villa_id) {
+      console.error('Missing villa_id parameter');
+    }
+    if (!check_in || !check_out) {
+      console.error('Missing date parameters:', { check_in, check_out });
+    }
+  }, [villa_id, check_in, check_out]);
 
   // Local state
   const [bookingRequest, setBookingRequest] = useState<BookingRequest>({
