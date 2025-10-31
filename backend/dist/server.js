@@ -509,10 +509,10 @@ app.get('/api/users/me/trips', authenticateToken, async (req, res) => {
         const params = [req.user.id];
         // Filter by status if provided
         if (status === 'upcoming') {
-            query += ` AND b.check_in_date >= CURRENT_DATE AND b.status IN ('confirmed', 'pending')`;
+            query += ` AND b.check_in_date::date >= CURRENT_DATE AND b.status IN ('confirmed', 'pending')`;
         }
         else if (status === 'past') {
-            query += ` AND b.check_out_date < CURRENT_DATE`;
+            query += ` AND b.check_out_date::date < CURRENT_DATE`;
         }
         query += ` ORDER BY b.check_in_date DESC`;
         const result = await client.query(query, params);
