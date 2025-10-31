@@ -550,6 +550,12 @@ const UV_TripDetails: React.FC = () => {
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Details</h3>
                 <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Price:</span>
+                    <span className="font-bold text-lg text-gray-900" data-testid="total-price">
+                      LYD {Number(booking.total_price).toFixed(2)}
+                    </span>
+                  </div>
                   {booking.status === 'confirmed' && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Method:</span>
@@ -558,12 +564,6 @@ const UV_TripDetails: React.FC = () => {
                       </span>
                     </div>
                   )}
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Price:</span>
-                    <span className="font-bold text-lg text-gray-900">
-                      LYD {Number(booking.total_price).toFixed(2)}
-                    </span>
-                  </div>
                 </div>
                 {booking.status === 'confirmed' && booking.preferred_payment_method === 'cash' && (
                   <div className="mt-3 p-3 bg-yellow-50 rounded-lg">

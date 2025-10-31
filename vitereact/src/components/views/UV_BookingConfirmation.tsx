@@ -238,6 +238,15 @@ const UV_BookingConfirmation: React.FC = () => {
     (1000 * 60 * 60 * 24)
   );
 
+  console.log('BookingConfirmation: Rendering page', { 
+    villa_id, 
+    check_in, 
+    check_out, 
+    num_guests,
+    villa: !!villa,
+    currentUser: !!currentUser 
+  });
+
   return (
     <>
       <div className="min-h-screen bg-gray-50 py-8" data-testid="booking-confirmation-page">
