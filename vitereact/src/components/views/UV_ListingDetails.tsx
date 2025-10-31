@@ -112,6 +112,17 @@ const UV_ListingDetails: React.FC = () => {
       return;
     }
 
+    if (!currentUser) {
+      const params = new URLSearchParams({
+        check_in: bookingDates.check_in.toISOString().split('T')[0],
+        check_out: bookingDates.check_out.toISOString().split('T')[0],
+        num_guests: bookingDates.num_guests.toString()
+      });
+      const targetPath = `/booking/request/${villa_id}?${params.toString()}`;
+      navigate(`/login?redirect=${encodeURIComponent(targetPath)}`);
+      return;
+    }
+
     try {
       const params = new URLSearchParams({
         check_in: bookingDates.check_in.toISOString().split('T')[0],
