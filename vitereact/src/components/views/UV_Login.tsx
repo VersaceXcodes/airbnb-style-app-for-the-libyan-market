@@ -30,9 +30,17 @@ const UV_Login: React.FC = () => {
   useEffect(() => {
     console.log('Login component auth state changed:', { isAuthenticated, isLoading });
     if (isAuthenticated && !isLoading) {
-      console.log('User authenticated, navigating to profile');
-      // Navigate to user profile after successful login
-      navigate('/profile');
+      console.log('User authenticated, checking for redirect');
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectPath = searchParams.get('redirect');
+      
+      if (redirectPath) {
+        console.log('Redirecting to:', redirectPath);
+        navigate(redirectPath);
+      } else {
+        console.log('No redirect, navigating to profile');
+        navigate('/profile');
+      }
     }
   }, [isAuthenticated, isLoading, navigate]);
 

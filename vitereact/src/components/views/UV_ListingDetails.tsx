@@ -108,23 +108,22 @@ const UV_ListingDetails: React.FC = () => {
   });
 
   const handleRequestToBook = () => {
-    if (!currentUser) {
-      navigate('/login');
-      return;
-    }
-
     if (!bookingDates.check_in || !bookingDates.check_out) {
-      alert('Please select check-in and check-out dates');
       return;
     }
 
-    const params = new URLSearchParams({
-      check_in: bookingDates.check_in.toISOString().split('T')[0],
-      check_out: bookingDates.check_out.toISOString().split('T')[0],
-      num_guests: bookingDates.num_guests.toString()
-    });
+    try {
+      const params = new URLSearchParams({
+        check_in: bookingDates.check_in.toISOString().split('T')[0],
+        check_out: bookingDates.check_out.toISOString().split('T')[0],
+        num_guests: bookingDates.num_guests.toString()
+      });
 
-    navigate(`/booking/request/${villa_id}?${params.toString()}`);
+      const targetPath = `/booking/request/${villa_id}?${params.toString()}`;
+      navigate(targetPath);
+    } catch (error) {
+      console.error('Error in handleRequestToBook:', error);
+    }
   };
 
   const handleContactHost = () => {
@@ -577,10 +576,11 @@ const UV_ListingDetails: React.FC = () => {
                   {/* Book Button */}
                   <button
                     onClick={handleRequestToBook}
+                    type="button"
                     className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={false}
+                    disabled={!bookingDates.check_in || !bookingDates.check_out}
                   >
-                    {currentUser ? 'Request to Book' : 'Log in to Book'}
+                    Request to Book
                   </button>
 
                   <p className="text-xs text-gray-500 text-center">
