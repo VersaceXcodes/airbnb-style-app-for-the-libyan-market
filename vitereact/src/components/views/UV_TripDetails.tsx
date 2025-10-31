@@ -547,32 +547,39 @@ const UV_TripDetails: React.FC = () => {
               </div>
 
               {/* Payment Information */}
-              {booking.status === 'confirmed' && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment</h3>
-                  <div className="space-y-2 text-sm">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Details</h3>
+                <div className="space-y-2 text-sm">
+                  {booking.status === 'confirmed' && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Method:</span>
                       <span className="font-medium capitalize">
                         {booking.preferred_payment_method.replace('_', ' ')}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Total Amount:</span>
-                      <span className="font-bold text-lg text-gray-900">
-                        LYD {booking.total_price.toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                  {booking.preferred_payment_method === 'cash' && (
-                    <div className="mt-3 p-3 bg-yellow-50 rounded-lg">
-                      <p className="text-xs text-yellow-800">
-                        💰 Please prepare cash for payment upon arrival
-                      </p>
-                    </div>
                   )}
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Price:</span>
+                    <span className="font-bold text-lg text-gray-900">
+                      LYD {Number(booking.total_price).toFixed(2)}
+                    </span>
+                  </div>
                 </div>
-              )}
+                {booking.status === 'confirmed' && booking.preferred_payment_method === 'cash' && (
+                  <div className="mt-3 p-3 bg-yellow-50 rounded-lg">
+                    <p className="text-xs text-yellow-800">
+                      💰 Please prepare cash for payment upon arrival
+                    </p>
+                  </div>
+                )}
+                {booking.status === 'pending' && (
+                  <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                    <p className="text-xs text-blue-800">
+                      💡 Payment method will be confirmed once the host accepts your booking
+                    </p>
+                  </div>
+                )}
+              </div>
 
               {/* Actions */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

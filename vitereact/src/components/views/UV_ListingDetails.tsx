@@ -146,7 +146,18 @@ const UV_ListingDetails: React.FC = () => {
 
       const targetPath = `/booking/request/${villa_id}?${params.toString()}`;
       console.log('Navigating to booking confirmation:', targetPath);
+      console.log('Navigation params:', {
+        villa_id,
+        check_in: bookingDates.check_in.toISOString().split('T')[0],
+        check_out: bookingDates.check_out.toISOString().split('T')[0],
+        num_guests: bookingDates.num_guests
+      });
+      
       navigate(targetPath);
+      
+      setTimeout(() => {
+        console.log('After navigation, current path:', window.location.pathname);
+      }, 100);
     } catch (error) {
       console.error('Error in handleRequestToBook:', error);
       setBookingError('An error occurred. Please try again.');

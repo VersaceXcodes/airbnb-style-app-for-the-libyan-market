@@ -54,13 +54,22 @@ const UV_BookingConfirmation: React.FC = () => {
 
   // Validate that we have required parameters
   useEffect(() => {
+    console.log('BookingConfirmation: Component mounted', {
+      villa_id,
+      check_in,
+      check_out,
+      num_guests,
+      currentUser: !!currentUser,
+      authToken: !!authToken
+    });
+    
     if (!villa_id) {
-      console.error('Missing villa_id parameter');
+      console.error('BookingConfirmation: Missing villa_id parameter');
     }
     if (!check_in || !check_out) {
-      console.error('Missing date parameters:', { check_in, check_out });
+      console.error('BookingConfirmation: Missing date parameters:', { check_in, check_out });
     }
-  }, [villa_id, check_in, check_out]);
+  }, [villa_id, check_in, check_out, num_guests, currentUser, authToken]);
 
   // Local state
   const [bookingRequest, setBookingRequest] = useState<BookingRequest>({
@@ -231,11 +240,11 @@ const UV_BookingConfirmation: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-50 py-8" data-testid="booking-confirmation-page">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Confirm Your Booking</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2" data-testid="booking-confirmation-title">Confirm Your Booking</h1>
             <p className="text-gray-600">Please review the details below before sending your request</p>
           </div>
 
@@ -395,6 +404,8 @@ const UV_BookingConfirmation: React.FC = () => {
                     type="submit"
                     disabled={submitBookingMutation.isPending}
                     className="w-full flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    data-testid="submit-booking-button"
+                    aria-label="Send Booking Request"
                   >
                     {submitBookingMutation.isPending ? (
                       <>
