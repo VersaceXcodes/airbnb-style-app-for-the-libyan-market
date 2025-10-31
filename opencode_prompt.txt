@@ -1,58 +1,60 @@
-STAGEHAND INTELLIGENT AGENT ANALYSIS & QUALITY ISSUES (Score: undefined/10)
+BACKEND STARTUP FAILURE - Immediate Fix Required
 
-🤖 INTELLIGENT AGENT FINDINGS:
+The backend server failed to start due to a critical error. You need to fix this NOW.
+
+## Error Type: Backend unhealthy or critical errors present
+
+## Backend Error Output (stderr):
+926:15)
+npm error     at validateBinaryVersion (/app/backend/node_modules/esbuild/install.js:102:28)
+npm error     at /app/backend/node_modules/esbuild/install.js:285:5 {
+npm error   status: 1,
+npm error   signal: null,
+npm error   output: [
+npm error     null,
+npm error     Buffer(0) [Uint8Array] [],
+npm error     Buffer(636) [Uint8Array] [
+npm error        47,  97, 112, 112,  47,  98,  97,  99, 107, 101, 110, 100,
+npm error        47, 110, 111, 100, 101,  95, 109, 111, 100, 117, 108, 101,
+npm error       115,  47, 101, 115,  98, 117, 105, 108, 100,  47,  98, 105,
+npm error       110,  47, 101, 115,  98, 117, 105, 108, 100,  58,  49,  10,
+npm error       127,  69,  76,  70,   2,   1,   1,  10,  94,  10,  10,  83,
+npm error       121, 110, 116,  97, 120,  69, 114, 114, 111, 114,  58,  32,
+npm error        73, 110, 118,  97, 108, 105, 100,  32, 111, 114,  32, 117,
+npm error       110, 101, 120, 112, 101,  99, 116, 101, 100,  32, 116, 111,
+npm error       107, 101, 110,  10,
+npm error       ... 536 more items
+npm error     ]
+npm error   ],
+npm error   pid: 960,
+npm error   stdout: Buffer(0) [Uint8Array] [],
+npm error   stderr: Buffer(636) [Uint8Array] [
+npm error      47,  97, 112, 112,  47,  98,  97,  99, 107, 101, 110, 100,
+npm error      47, 110, 111, 100, 101,  95, 109, 111, 100, 117, 108, 101,
+npm error     115,  47, 101, 115,  98, 117, 105, 108, 100,  47,  98, 105,
+npm error     110,  47, 101, 115,  98, 117, 105, 108, 100,  58,  49,  10,
+npm error     127,  69,  76,  70,   2,   1,   1,  10,  94,  10,  10,  83,
+npm error     121, 110, 116,  97, 120,  69, 114, 114, 111, 114,  58,  32,
+npm error      73, 110, 118,  97, 108, 105, 100,  32, 111, 114,  32, 117,
+npm error     110, 101, 120, 112, 101,  99, 116, 101, 100,  32, 116, 111,
+npm error     107, 101, 110,  10,
+npm error     ... 536 more items
+npm error   ]
+npm error }
+npm error
+npm error Node.js v18.20.8
+npm error A complete log of this run can be found in: /root/.npm/_logs/2025-10-31T11_16_15_100Z-debug-0.log
 
 
-🎭 STAGEHAND COMPREHENSIVE REPORT:
-No detailed report available
+## Backend Console Output (stdout):
+No stdout output
 
-📸 VISUAL EVIDENCE - SCREENSHOTS:
-No screenshots available
+## Working Directory: /app/vitereact
 
-🧪 FAILED TEST SCREENSHOTS (if any):
-No failed test screenshots captured
+## Your Task:
+1. **Analyze the Error**: Identify the exact TypeScript/JavaScript syntax error or compilation issue
+2. **Locate the Problem**: Find which file has the error (check stack trace and error messages)
+3. **Apply the Fix**: Use available tools to fix the specific syntax/compilation issue
+4. **Focus on Root Cause**: Fix the underlying code problem, not infrastructure
 
-🚨 CRITICAL TECHNICAL FIXES REQUIRED:
-No critical issues detected
-
-🚨 ADDITIONAL ISSUES TO FIX:
-No additional issues listed
-
-🎯 YOUR CRITICAL TASK - IMPLEMENT EXACT TECHNICAL FIXES:
-
-**PRIORITY 1 - CRITICAL TECHNICAL FIXES:**
-If CORS/Host configuration errors were detected above, you MUST:
-- Open and edit the vite.config.js file (or similar configuration file)
-- Add the exact blocked hostname to server.allowedHosts array
-- Example: server: { allowedHosts: ['blocked-hostname.trycloudflare.com'] }
-
-If JavaScript errors were detected, you MUST:
-- Fix the exact JavaScript runtime errors mentioned above
-- Ensure proper imports and module resolution
-- Fix any TypeScript compilation errors
-
-**PRIORITY 2 - QUALITY IMPROVEMENTS:**
-1. **UI/UX Issues**: Fix layout, design, and user interface problems identified by browser testing
-2. **Performance Issues**: Optimize loading times, reduce bundle size, improve Core Web Vitals
-3. **Accessibility Issues**: Add proper ARIA labels, keyboard navigation, improve contrast ratios
-4. **Mobile Responsiveness**: Ensure proper display and functionality on all device sizes
-5. **Interactive Elements**: Fix broken buttons, forms, navigation, and user interactions
-6. **Content Quality**: Improve text clarity, add missing content, fix broken links
-7. **SEO Issues**: Add proper meta tags, titles, descriptions, structured data
-8. **Error Handling**: Fix JavaScript errors, improve error messages, add loading states
-
-**INTELLIGENT AGENT DETECTED CRITICAL ISSUES** that prevent the application from loading properly. These are blocking deployment and MUST be fixed first.
-
-🚨 **SPECIAL ATTENTION - 403 HOST ERRORS**: 
-
-
-🔒 ENV RULES (Do Not Modify):
-- Do NOT modify any environment files: .env, vitereact/.env, backend/.env.
-- Do NOT change any VITE_* variables in any env files.
-- Never set VITE_API_BASE_URL or API_BASE_URL to localhost or 127.0.0.1.
-- Always use import.meta.env.VITE_API_BASE_URL for API requests; keep it pointing to the current tunnel URL.
-- Current tunnel host: 123airbnb-style-app-for-the-libyan-market.launchpulse.ai
-
-Pay special attention to the "🔧 EXACT FIX NEEDED" sections above - these provide specific technical solutions that you should implement immediately.
-
-Focus on the exact issues reported by the intelligent Stagehand agent. The agent has analyzed the application and provided specific technical fixes. Implement these fixes precisely as recommended.
+IMPORTANT: This is a CODE error, not an infrastructure error. Fix the syntax/compilation issue in the backend code.
