@@ -139,12 +139,6 @@ app.use(express.static(path.join(__dirname, 'public'), {
         }
     }
 }));
-// SPA catch-all: serve index.html for all non-API routes
-app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api')) {
-        res.sendFile(path.join(__dirname, 'public', 'index.html'));
-    }
-});
 const upload = multer({ storage: storage });
 function createErrorResponse(message, error, errorCode) {
     const response = {
