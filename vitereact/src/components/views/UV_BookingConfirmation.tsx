@@ -132,7 +132,7 @@ const UV_BookingConfirmation: React.FC = () => {
     onSuccess: (data) => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
-      queryClient.invalidateQueries({ queryKey: ['user-trips'] });
+      queryClient.invalidateQueries({ queryKey: ['userTrips'] });
       
       // Navigate to trip details
       navigate(`/trip/${data.id}`);
@@ -280,7 +280,9 @@ const UV_BookingConfirmation: React.FC = () => {
 
               {/* Message to Host */}
               <div className="bg-white rounded-xl shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Message to Host</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Message to Host <span className="text-red-500">*</span>
+                </h3>
                 <p className="text-sm text-gray-600 mb-4">
                   Introduce yourself and let the host know why you're interested in their property.
                 </p>
@@ -291,6 +293,7 @@ const UV_BookingConfirmation: React.FC = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                   placeholder="Hi! I'm interested in booking your property. I'm visiting for..."
                   aria-label="Message to host"
+                  required
                 />
                 {bookingRequest.guest_message.length > 0 && (
                   <p className="text-xs text-gray-500 mt-2">
