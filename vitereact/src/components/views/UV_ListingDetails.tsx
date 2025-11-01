@@ -142,7 +142,6 @@ const UV_ListingDetails: React.FC = () => {
     });
 
     setBookingError(null);
-    setIsNavigating(true);
 
     if (!bookingDates.check_in || !bookingDates.check_out) {
       console.error('❌ Missing dates for booking', {
@@ -150,7 +149,6 @@ const UV_ListingDetails: React.FC = () => {
         check_out: bookingDates.check_out
       });
       setBookingError('Please select check-in and check-out dates');
-      setIsNavigating(false);
       return;
     }
 
@@ -160,7 +158,6 @@ const UV_ListingDetails: React.FC = () => {
     if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) {
       console.error('Invalid dates for booking');
       setBookingError('Invalid dates selected. Please try again.');
-      setIsNavigating(false);
       return;
     }
 
@@ -177,37 +174,33 @@ const UV_ListingDetails: React.FC = () => {
       return;
     }
 
-    try {
-      const params = new URLSearchParams({
-        check_in: formatDateForUrl(checkInDate),
-        check_out: formatDateForUrl(checkOutDate),
-        num_guests: bookingDates.num_guests.toString()
-      });
+    const params = new URLSearchParams({
+      check_in: formatDateForUrl(checkInDate),
+      check_out: formatDateForUrl(checkOutDate),
+      num_guests: bookingDates.num_guests.toString()
+    });
 
-      const targetPath = `/booking/request/${villa_id}?${params.toString()}`;
-      console.log('User IS authenticated, navigating to booking confirmation');
-      console.log('Target path:', targetPath);
-      console.log('Navigation params:', {
-        villa_id,
-        check_in: formatDateForUrl(checkInDate),
-        check_out: formatDateForUrl(checkOutDate),
-        num_guests: bookingDates.num_guests
-      });
-      
-      // Navigate to booking confirmation page
-      navigate(targetPath);
-      
-      setTimeout(() => {
-        console.log('After navigation - current path:', window.location.pathname);
-        console.log('After navigation - current search:', window.location.search);
-        console.log('After navigation - full URL:', window.location.href);
-        setIsNavigating(false);
-      }, 100);
-    } catch (error) {
-      console.error('Error in handleRequestToBook:', error);
-      setBookingError('An error occurred. Please try again.');
-      setIsNavigating(false);
+    const targetPath = `/booking/request/${villa_id}?${params.toString()}`;
+    console.log('✅✅✅ NAVIGATING TO BOOKING CONFIRMATION ✅✅✅');
+    console.log('✅ User IS authenticated, navigating to booking confirmation');
+    console.log('✅ Target path:', targetPath);
+    console.log('✅ Full URL will be:', window.location.origin + targetPath);
+    console.log('✅ Navigation params:', {
+      villa_id,
+      check_in: formatDateForUrl(checkInDate),
+      check_out: formatDateForUrl(checkOutDate),
+      num_guests: bookingDates.num_guests
+    });
+    
+    setIsNavigating(true);
+    
+    // Set a global flag for testing
+    if (typeof window !== 'undefined') {
+      (window as any).__NAVIGATION_INITIATED__ = true;
+      (window as any).__NAVIGATION_TARGET__ = targetPath;
     }
+    
+    navigate(targetPath);
   };
 
   const handleContactHost = () => {
@@ -686,10 +679,11 @@ const UV_ListingDetails: React.FC = () => {
                   <button
                     onClick={handleRequestToBook}
                     type="button"
-                    disabled={isNavigating}
+                    disabled={isNavigating || !bookingDates.check_in || !bookingDates.check_out}
                     className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
                     data-testid="request-to-book-button"
                     aria-label="Request to Book"
+                    id="request-to-book-btn"
                   >
                     {isNavigating ? 'Loading...' : 'Request to Book'}
                   </button>

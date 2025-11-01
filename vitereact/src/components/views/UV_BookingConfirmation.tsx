@@ -58,6 +58,7 @@ const UV_BookingConfirmation: React.FC = () => {
 
   // Validate that we have required parameters
   useEffect(() => {
+    console.log('✅✅✅ BOOKING CONFIRMATION PAGE LOADED ✅✅✅');
     console.log('BookingConfirmation: Component mounted', {
       villa_id,
       check_in,
@@ -66,6 +67,11 @@ const UV_BookingConfirmation: React.FC = () => {
       currentUser: !!currentUser,
       authToken: !!authToken
     });
+    
+    // Signal to tests that page has loaded
+    if (typeof window !== 'undefined') {
+      (window as any).__BOOKING_CONFIRMATION_LOADED__ = true;
+    }
     
     if (!villa_id) {
       console.error('BookingConfirmation: Missing villa_id parameter');
@@ -287,11 +293,11 @@ const UV_BookingConfirmation: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 py-8" data-testid="booking-confirmation-page">
+      <div className="min-h-screen bg-gray-50 py-8" data-testid="booking-confirmation-page" role="main" aria-label="Booking Confirmation">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2" data-testid="booking-confirmation-title">Confirm Your Booking</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2" data-testid="booking-confirmation-title" id="booking-confirmation-heading">Confirm Your Booking</h1>
             <p className="text-gray-600">Please review the details below before sending your request</p>
           </div>
 
