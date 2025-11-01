@@ -6,9 +6,10 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec \"tsx\" server.ts",
+    "start": "node start-prod.js",
     "build": "tsc",
     "dev": "tsx server.ts",
+    "dev:watch": "nodemon --exec \"tsx\" server.ts",
     "prod": "node start-prod.js",
     "test": "jest",
     "test:watch": "jest --watch",
