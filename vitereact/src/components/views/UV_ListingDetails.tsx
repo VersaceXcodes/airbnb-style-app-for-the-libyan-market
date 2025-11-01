@@ -66,6 +66,7 @@ const UV_ListingDetails: React.FC = () => {
   
   // Global state
   const currentUser = useAppStore(state => state.authentication_state.current_user);
+  const authToken = useAppStore(state => state.authentication_state.auth_token);
   // const searchFilters = useAppStore(state => state.current_search_filters);
   // const updateSearchFilters = useAppStore(state => state.update_search_filters);
 
@@ -118,6 +119,7 @@ const UV_ListingDetails: React.FC = () => {
   });
 
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const formatDateForUrl = (date: Date): string => {
     const year = date.getFullYear();
@@ -127,17 +129,28 @@ const UV_ListingDetails: React.FC = () => {
   };
 
   const handleRequestToBook = () => {
-    console.log('Request to Book clicked', { 
+    console.log('🎯 Request to Book clicked', { 
       villa_id, 
-      bookingDates, 
-      currentUser: !!currentUser 
+      check_in: bookingDates.check_in,
+      check_out: bookingDates.check_out,
+      num_guests: bookingDates.num_guests,
+      check_in_type: typeof bookingDates.check_in,
+      check_out_type: typeof bookingDates.check_out,
+      currentUser: !!currentUser,
+      isAuthenticated: !!currentUser,
+      hasToken: !!authToken
     });
 
     setBookingError(null);
+    setIsNavigating(true);
 
     if (!bookingDates.check_in || !bookingDates.check_out) {
-      console.error('Missing dates for booking');
+      console.error('❌ Missing dates for booking', {
+        check_in: bookingDates.check_in,
+        check_out: bookingDates.check_out
+      });
       setBookingError('Please select check-in and check-out dates');
+      setIsNavigating(false);
       return;
     }
 
@@ -147,6 +160,7 @@ const UV_ListingDetails: React.FC = () => {
     if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) {
       console.error('Invalid dates for booking');
       setBookingError('Invalid dates selected. Please try again.');
+      setIsNavigating(false);
       return;
     }
 
@@ -171,7 +185,8 @@ const UV_ListingDetails: React.FC = () => {
       });
 
       const targetPath = `/booking/request/${villa_id}?${params.toString()}`;
-      console.log('Navigating to booking confirmation:', targetPath);
+      console.log('User IS authenticated, navigating to booking confirmation');
+      console.log('Target path:', targetPath);
       console.log('Navigation params:', {
         villa_id,
         check_in: formatDateForUrl(checkInDate),
@@ -179,14 +194,19 @@ const UV_ListingDetails: React.FC = () => {
         num_guests: bookingDates.num_guests
       });
       
+      // Navigate to booking confirmation page
       navigate(targetPath);
       
       setTimeout(() => {
-        console.log('After navigation, current path:', window.location.pathname);
+        console.log('After navigation - current path:', window.location.pathname);
+        console.log('After navigation - current search:', window.location.search);
+        console.log('After navigation - full URL:', window.location.href);
+        setIsNavigating(false);
       }, 100);
     } catch (error) {
       console.error('Error in handleRequestToBook:', error);
       setBookingError('An error occurred. Please try again.');
+      setIsNavigating(false);
     }
   };
 
@@ -666,11 +686,12 @@ const UV_ListingDetails: React.FC = () => {
                   <button
                     onClick={handleRequestToBook}
                     type="button"
-                    className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    disabled={isNavigating}
+                    className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
                     data-testid="request-to-book-button"
                     aria-label="Request to Book"
                   >
-                    Request to Book
+                    {isNavigating ? 'Loading...' : 'Request to Book'}
                   </button>
 
                   <p className="text-xs text-gray-500 text-center">

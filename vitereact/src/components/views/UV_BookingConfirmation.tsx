@@ -38,6 +38,8 @@ interface CreateBookingResponse {
 }
 
 const UV_BookingConfirmation: React.FC = () => {
+  console.log('🚀 BookingConfirmation component rendering started');
+  
   const { villa_id } = useParams<{ villa_id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -45,6 +47,8 @@ const UV_BookingConfirmation: React.FC = () => {
   // Global state access
   const currentUser = useAppStore(state => state.authentication_state.current_user);
   const authToken = useAppStore(state => state.authentication_state.auth_token);
+  
+  console.log('🚀 BookingConfirmation - Villa ID from params:', villa_id);
 
   // URL parameters
   const searchParams = new URLSearchParams(window.location.search);
