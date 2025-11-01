@@ -196,8 +196,11 @@ const UV_BookingConfirmation: React.FC = () => {
   if (isLoading) {
     return (
       <>
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50" data-testid="booking-confirmation-loading">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading booking details...</p>
+          </div>
         </div>
       </>
     );
@@ -205,12 +208,18 @@ const UV_BookingConfirmation: React.FC = () => {
 
   // Error state
   if (error || !villa) {
+    console.error('BookingConfirmation: Error loading villa', { error, villa_id });
     return (
       <>
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50" data-testid="booking-confirmation-error">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Property Not Found</h2>
-            <p className="text-gray-600 mb-6">The property you're trying to book could not be found.</p>
+            <p className="text-gray-600 mb-6">
+              {error ? 'Error loading property details.' : 'The property you\'re trying to book could not be found.'}
+            </p>
+            {error && (
+              <p className="text-sm text-red-600 mb-4">{error.message}</p>
+            )}
             <Link 
               to="/search"
               className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
@@ -321,6 +330,7 @@ const UV_BookingConfirmation: React.FC = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                   placeholder="Hi! I'm interested in booking your property. I'm visiting for..."
                   aria-label="Message to host"
+                  data-testid="guest-message-textarea"
                   required
                 />
                 {bookingRequest.guest_message.length > 0 && (
@@ -346,6 +356,7 @@ const UV_BookingConfirmation: React.FC = () => {
                         setSubmitError(null);
                       }}
                       className="mt-1 mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      data-testid="house-rules-checkbox"
                     />
                     <span className="text-sm text-gray-700">
                       I have read and agree to the house rules
