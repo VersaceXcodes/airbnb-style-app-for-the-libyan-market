@@ -79,7 +79,17 @@ const UV_ListingDetails: React.FC = () => {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
-  // Initialize booking dates from URL params
+  const parseDateFromUrl = (dateStr: string | null): Date | null => {
+    if (!dateStr) return null;
+    
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+    
+    return date;
+  };
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const checkIn = urlParams.get('check_in');
@@ -87,8 +97,8 @@ const UV_ListingDetails: React.FC = () => {
     const numGuests = urlParams.get('num_guests');
 
     setBookingDates({
-      check_in: checkIn ? new Date(checkIn) : null,
-      check_out: checkOut ? new Date(checkOut) : null,
+      check_in: parseDateFromUrl(checkIn),
+      check_out: parseDateFromUrl(checkOut),
       num_guests: numGuests ? parseInt(numGuests) : 1
     });
   }, []);
@@ -109,6 +119,13 @@ const UV_ListingDetails: React.FC = () => {
 
   const [bookingError, setBookingError] = useState<string | null>(null);
 
+  const formatDateForUrl = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleRequestToBook = () => {
     console.log('Request to Book clicked', { 
       villa_id, 
@@ -124,11 +141,20 @@ const UV_ListingDetails: React.FC = () => {
       return;
     }
 
+    const checkInDate = new Date(bookingDates.check_in);
+    const checkOutDate = new Date(bookingDates.check_out);
+
+    if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) {
+      console.error('Invalid dates for booking');
+      setBookingError('Invalid dates selected. Please try again.');
+      return;
+    }
+
     if (!currentUser) {
       console.log('User not authenticated, redirecting to login');
       const params = new URLSearchParams({
-        check_in: bookingDates.check_in.toISOString().split('T')[0],
-        check_out: bookingDates.check_out.toISOString().split('T')[0],
+        check_in: formatDateForUrl(checkInDate),
+        check_out: formatDateForUrl(checkOutDate),
         num_guests: bookingDates.num_guests.toString()
       });
       const targetPath = `/booking/request/${villa_id}?${params.toString()}`;
@@ -139,8 +165,8 @@ const UV_ListingDetails: React.FC = () => {
 
     try {
       const params = new URLSearchParams({
-        check_in: bookingDates.check_in.toISOString().split('T')[0],
-        check_out: bookingDates.check_out.toISOString().split('T')[0],
+        check_in: formatDateForUrl(checkInDate),
+        check_out: formatDateForUrl(checkOutDate),
         num_guests: bookingDates.num_guests.toString()
       });
 
@@ -148,8 +174,8 @@ const UV_ListingDetails: React.FC = () => {
       console.log('Navigating to booking confirmation:', targetPath);
       console.log('Navigation params:', {
         villa_id,
-        check_in: bookingDates.check_in.toISOString().split('T')[0],
-        check_out: bookingDates.check_out.toISOString().split('T')[0],
+        check_in: formatDateForUrl(checkInDate),
+        check_out: formatDateForUrl(checkOutDate),
         num_guests: bookingDates.num_guests
       });
       
@@ -553,13 +579,17 @@ const UV_ListingDetails: React.FC = () => {
                       <label className="block text-xs font-medium text-gray-700 mb-1">CHECK-IN</label>
                       <input
                         type="date"
-                        value={bookingDates.check_in ? bookingDates.check_in.toISOString().split('T')[0] : ''}
+                        value={bookingDates.check_in ? formatDateForUrl(bookingDates.check_in) : ''}
                         onChange={(e) => {
-                          const date = e.target.value ? new Date(e.target.value) : null;
-                          setBookingDates(prev => ({ ...prev, check_in: date }));
+                          if (e.target.value) {
+                            const date = new Date(e.target.value + 'T00:00:00');
+                            setBookingDates(prev => ({ ...prev, check_in: date }));
+                          } else {
+                            setBookingDates(prev => ({ ...prev, check_in: null }));
+                          }
                           setBookingError(null);
                         }}
-                        min={new Date().toISOString().split('T')[0]}
+                        min={formatDateForUrl(new Date())}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                         data-testid="check-in-date"
                         aria-label="Check-in date"
@@ -569,13 +599,17 @@ const UV_ListingDetails: React.FC = () => {
                       <label className="block text-xs font-medium text-gray-700 mb-1">CHECKOUT</label>
                       <input
                         type="date"
-                        value={bookingDates.check_out ? bookingDates.check_out.toISOString().split('T')[0] : ''}
+                        value={bookingDates.check_out ? formatDateForUrl(bookingDates.check_out) : ''}
                         onChange={(e) => {
-                          const date = e.target.value ? new Date(e.target.value) : null;
-                          setBookingDates(prev => ({ ...prev, check_out: date }));
+                          if (e.target.value) {
+                            const date = new Date(e.target.value + 'T00:00:00');
+                            setBookingDates(prev => ({ ...prev, check_out: date }));
+                          } else {
+                            setBookingDates(prev => ({ ...prev, check_out: null }));
+                          }
                           setBookingError(null);
                         }}
-                        min={bookingDates.check_in ? new Date(bookingDates.check_in.getTime() + 86400000).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+                        min={bookingDates.check_in ? formatDateForUrl(new Date(bookingDates.check_in.getTime() + 86400000)) : formatDateForUrl(new Date())}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                         data-testid="check-out-date"
                         aria-label="Check-out date"

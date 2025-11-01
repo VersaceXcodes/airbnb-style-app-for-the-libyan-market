@@ -8,8 +8,8 @@ import { useAppStore } from '@/store/main';
 interface Villa {
   id: string;
   title: string;
-  price_per_night: number;
-  cleaning_fee: number | null;
+  price_per_night: number | string;
+  cleaning_fee: number | string | null;
   house_rules: string | null;
   photos?: Array<{
     id: string;
@@ -71,11 +71,28 @@ const UV_BookingConfirmation: React.FC = () => {
     }
   }, [villa_id, check_in, check_out, num_guests, currentUser, authToken]);
 
-  // Local state
+  const parseDate = (dateStr: string | null): Date => {
+    if (!dateStr) return new Date();
+    
+    if (dateStr.includes('-') && dateStr.split('-')[0].length === 4) {
+      return new Date(dateStr);
+    }
+    
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      const month = parseInt(parts[0]) - 1;
+      const day = parseInt(parts[1]);
+      const year = parseInt(parts[2]);
+      return new Date(year, month, day);
+    }
+    
+    return new Date(dateStr);
+  };
+
   const [bookingRequest, setBookingRequest] = useState<BookingRequest>({
     villa_id: villa_id || '',
-    check_in_date: check_in ? new Date(check_in) : new Date(),
-    check_out_date: check_out ? new Date(check_out) : new Date(),
+    check_in_date: check_in ? parseDate(check_in) : new Date(),
+    check_out_date: check_out ? parseDate(check_out) : new Date(),
     num_guests: num_guests ? parseInt(num_guests) : 1,
     guest_message: ''
   });
@@ -112,12 +129,20 @@ const UV_BookingConfirmation: React.FC = () => {
       return { nightly_total: 0, cleaning_fee: null, total: 0 };
     }
 
-    const nightly_total = nights * villa.price_per_night;
-    const total = nightly_total + (villa.cleaning_fee || 0);
+    const pricePerNight = typeof villa.price_per_night === 'string' 
+      ? parseFloat(villa.price_per_night) 
+      : villa.price_per_night;
+    
+    const cleaningFeeValue = villa.cleaning_fee 
+      ? (typeof villa.cleaning_fee === 'string' ? parseFloat(villa.cleaning_fee) : villa.cleaning_fee)
+      : 0;
+
+    const nightly_total = nights * pricePerNight;
+    const total = nightly_total + cleaningFeeValue;
 
     return {
       nightly_total,
-      cleaning_fee: villa.cleaning_fee,
+      cleaning_fee: cleaningFeeValue || null,
       total
     };
   }, [villa, bookingRequest.check_in_date, bookingRequest.check_out_date]);
@@ -392,12 +417,12 @@ const UV_BookingConfirmation: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">
-                      ${villa.price_per_night} × {nights} night{nights > 1 ? 's' : ''}
+                      ${typeof villa.price_per_night === 'string' ? parseFloat(villa.price_per_night).toFixed(2) : villa.price_per_night.toFixed(2)} × {nights} night{nights > 1 ? 's' : ''}
                     </span>
                     <span className="font-medium text-gray-900">${priceBreakdown.nightly_total.toFixed(2)}</span>
                   </div>
                   
-                  {priceBreakdown.cleaning_fee && (
+                  {priceBreakdown.cleaning_fee !== null && (
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Cleaning fee</span>
                       <span className="font-medium text-gray-900">${priceBreakdown.cleaning_fee.toFixed(2)}</span>
