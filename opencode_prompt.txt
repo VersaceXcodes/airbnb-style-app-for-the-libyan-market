@@ -5,41 +5,49 @@ The backend server failed to start due to a critical error. You need to fix this
 ## Error Type: Backend unhealthy or critical errors present
 
 ## Backend Error Output (stderr):
-ight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-npm warn deprecated supertest@6.3.4: Please upgrade to supertest v7.1.3+, see release notes at https://github.com/forwardemail/supertest/releases/tag/v7.1.3 - maintenance is supported by Forward Email @ https://forwardemail.net
-npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
-npm warn deprecated superagent@8.1.2: Please upgrade to superagent v10.2.2+, see release notes at https://github.com/forwardemail/superagent/releases/tag/v10.2.2 - maintenance is supported by Forward Email @ https://forwardemail.net
-npm warn exec The following package was not found and will be installed: tsx@4.20.6
-
-node:internal/process/esm_loader:40
-      internalBinding('errors').triggerUncaughtException(
-                                ^
-Error [ERR_MODULE_NOT_FOUND]: Cannot find package '/app/backend/node_modules/express/' imported from /app/backend/server.ts
-    at new NodeError (node:internal/errors:405:5)
-    at legacyMainResolve (node:internal/modules/esm/resolve:218:9)
-    at packageResolve (node:internal/modules/esm/resolve:903:14)
-    at moduleResolve (node:internal/modules/esm/resolve:973:20)
-    at defaultResolve (node:internal/modules/esm/resolve:1206:11)
-    at nextResolve (node:internal/modules/esm/hooks:864:28)
-    at resolveBase (file:///root/.npm/_npx/fd45a72a545557e9/node_modules/tsx/dist/esm/index.mjs?1762025957504:2:3744)
-    at resolveDirectory (file:///root/.npm/_npx/fd45a72a545557e9/node_modules/tsx/dist/esm/index.mjs?1762025957504:2:4243)
-    at resolveTsPaths (file:///root/.npm/_npx/fd45a72a545557e9/node_modules/tsx/dist/esm/index.mjs?1762025957504:2:4984)
-    at resolve (file:///root/.npm/_npx/fd45a72a545557e9/node_modules/tsx/dist/esm/index.mjs?1762025957504:2:5361) {
-  code: 'ERR_MODULE_NOT_FOUND'
-}
-
-Node.js v18.20.8
+26:15)
+npm error     at validateBinaryVersion (/app/backend/node_modules/esbuild/install.js:102:28)
+npm error     at /app/backend/node_modules/esbuild/install.js:285:5 {
+npm error   status: 1,
+npm error   signal: null,
+npm error   output: [
+npm error     null,
+npm error     Buffer(0) [Uint8Array] [],
+npm error     Buffer(636) [Uint8Array] [
+npm error        47,  97, 112, 112,  47,  98,  97,  99, 107, 101, 110, 100,
+npm error        47, 110, 111, 100, 101,  95, 109, 111, 100, 117, 108, 101,
+npm error       115,  47, 101, 115,  98, 117, 105, 108, 100,  47,  98, 105,
+npm error       110,  47, 101, 115,  98, 117, 105, 108, 100,  58,  49,  10,
+npm error       127,  69,  76,  70,   2,   1,   1,  10,  94,  10,  10,  83,
+npm error       121, 110, 116,  97, 120,  69, 114, 114, 111, 114,  58,  32,
+npm error        73, 110, 118,  97, 108, 105, 100,  32, 111, 114,  32, 117,
+npm error       110, 101, 120, 112, 101,  99, 116, 101, 100,  32, 116, 111,
+npm error       107, 101, 110,  10,
+npm error       ... 536 more items
+npm error     ]
+npm error   ],
+npm error   pid: 1101,
+npm error   stdout: Buffer(0) [Uint8Array] [],
+npm error   stderr: Buffer(636) [Uint8Array] [
+npm error      47,  97, 112, 112,  47,  98,  97,  99, 107, 101, 110, 100,
+npm error      47, 110, 111, 100, 101,  95, 109, 111, 100, 117, 108, 101,
+npm error     115,  47, 101, 115,  98, 117, 105, 108, 100,  47,  98, 105,
+npm error     110,  47, 101, 115,  98, 117, 105, 108, 100,  58,  49,  10,
+npm error     127,  69,  76,  70,   2,   1,   1,  10,  94,  10,  10,  83,
+npm error     121, 110, 116,  97, 120,  69, 114, 114, 111, 114,  58,  32,
+npm error      73, 110, 118,  97, 108, 105, 100,  32, 111, 114,  32, 117,
+npm error     110, 101, 120, 112, 101,  99, 116, 101, 100,  32, 116, 111,
+npm error     107, 101, 110,  10,
+npm error     ... 536 more items
+npm error   ]
+npm error }
+npm error
+npm error Node.js v18.20.8
+npm error A complete log of this run can be found in: /root/.npm/_logs/2025-11-02T14_23_10_791Z-debug-0.log
 
 
 ## Backend Console Output (stdout):
-
-added 577 packages, and audited 578 packages in 6s
-
-63 packages are looking for funding
-  run `npm fund` for details
-
-found 0 vulnerabilities
-
+No stdout output
 
 ## Working Directory: /app/vitereact
 
